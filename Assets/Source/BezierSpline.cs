@@ -177,7 +177,9 @@ public class BezierSpline : MonoBehaviour
 
     public void CreateStartAnchor()
     {
-        startAnchor = new GameObject("StartAnchor").transform;
+        startAnchor = Instantiate(splineManager.anchorTemplate).transform;
+        startAnchor.gameObject.name = "StartAnchor";
+
         startAnchor.position = StartPoint;
         startAnchor.SetParent(AnchorContainer);
     }
@@ -189,7 +191,9 @@ public class BezierSpline : MonoBehaviour
 
     public void CreateEndAnchor()
     {
-        endAnchor = new GameObject("EndAnchor").transform;
+        endAnchor = Instantiate(splineManager.anchorTemplate).transform;
+        endAnchor.gameObject.name = "EndAnchor";
+
         endAnchor.position = EndPoint;
         endAnchor.SetParent(AnchorContainer);
     }

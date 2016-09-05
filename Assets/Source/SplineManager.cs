@@ -8,6 +8,7 @@ public class SplineManager : MonoBehaviour
     public List<BezierSpline> Splines { get { return splines; } }
 
     public BezierSpline splineTemplate;
+    public GameObject anchorTemplate;
 
     public BezierSpline AddSpline()
     {

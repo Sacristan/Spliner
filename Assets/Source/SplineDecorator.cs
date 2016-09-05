@@ -8,6 +8,7 @@ public class SplineDecorator : MonoBehaviour
     public Transform itemToSpawn;
 
     private const float DISTANCE_PER_KNOB = 75f;
+    private const float OFFET_FROM_BORDERS = 50f;
 
     float lastLength = 0f;
 
@@ -92,12 +93,16 @@ public class SplineDecorator : MonoBehaviour
     private void Generate()
     {
         float stepSize = 1f / StepSize;
+        float offSetNormalized = 1f / OFFET_FROM_BORDERS;
 
         for (int i = 0; i < PointsRequiredOnSpline; i++)
         {
             Transform itemSpawned = Instantiate(itemToSpawn) as Transform;
 
             float stepNormalized = (i * stepSize);
+
+            if (stepNormalized < offSetNormalized || stepNormalized > (1 - offSetNormalized)) continue;
+
             Vector3 position = spline.GetPoint(stepNormalized);
 
             itemSpawned.transform.localPosition = position;
