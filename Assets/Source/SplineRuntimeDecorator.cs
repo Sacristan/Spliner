@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class SplineRuntimeDecorator : MonoBehaviour
 {
@@ -6,6 +7,11 @@ public class SplineRuntimeDecorator : MonoBehaviour
     public Transform itemToSpawn;
 
     private const float DISTANCE_PER_KNOB = 75f;
+
+    float lastLength = 0f;
+    float lastLegthInFrame = 0f;
+
+    bool inChange = false;
 
     private BezierSpline Spline
     {
@@ -32,30 +38,64 @@ public class SplineRuntimeDecorator : MonoBehaviour
         }
     }
 
+    private Transform[] Children
+    {
+        get
+        {
+            return GetComponentsInChildren<Transform>();
+        }
+    }
+
     private void Awake()
     {
+        InvokeRepeating("HandleLengthChangeIfRequired", 0f, 0.5f);
+    }
+
+    void HandleLengthChangeIfRequired()
+    {
+        bool lengthChanged = lastLength != Spline.Length;
+
+        if (lengthChanged)
+        {
+            inChange = true;
+            lastLength = Spline.Length;
+        }
+        else
+        {
+            if (inChange)
+                HandleLengthChange();
+
+            inChange = false;
+        }
+    }
+
+    private void HandleLengthChange()
+    {
+        Debug.Log("HandleLengthChange");
+
+        Cleanup();
         Generate();
     }
 
-    void Update()
+    private void Cleanup()
     {
-        Debug.Log("Spline length: "+ Spline.Length);
+        foreach (Transform child in Children)
+        {
+            if (child == transform) continue;
+            Destroy(child.gameObject);
+        }
     }
 
     private void Generate()
     {
         float stepSize = 1f / StepSize;
 
-        for(int i =0; i < PointsRequiredOnSpline; i++)
+        for (int i = 0; i < PointsRequiredOnSpline; i++)
         {
             Transform itemSpawned = Instantiate(itemToSpawn) as Transform;
 
-
-            float normalStep = (i * stepSize);
-
-            Debug.Log(normalStep);
-
-            Vector3 position = spline.GetPoint(normalStep);
+            float stepNormalized = (i * stepSize);
+            Vector3 position = spline.GetPoint(stepNormalized);
 
             itemSpawned.transform.localPosition = position;
             itemSpawned.transform.SetParent(transform);
