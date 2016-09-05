@@ -27,6 +27,12 @@ public class BezierSpline : MonoBehaviour
     [SerializeField]
     private bool createAnchorsOnAwake = false;
 
+    public bool IsDirty
+    {
+        get { return isDirty; }
+        set { isDirty = value; }
+    }
+
     void Awake()
     {
         if (createAnchorsOnAwake)
@@ -39,7 +45,7 @@ public class BezierSpline : MonoBehaviour
 
     void Update()
     {
-        if (isDirty) return;
+        if (IsDirty) return;
         Debug.DrawLine(StartPoint, EndPoint, Color.red);
 
         SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.position));
@@ -162,21 +168,26 @@ public class BezierSpline : MonoBehaviour
         }
         else
         {
-            startAnchor = PrevSpline.EndAnchor;
+            TakeStartAnchorFromSplineEndAnchor(PrevSpline);
         }
 
         CreateEndAnchor();
         isDirty = false;
     }
 
-    private void CreateStartAnchor()
+    public void CreateStartAnchor()
     {
         startAnchor = new GameObject("StartAnchor").transform;
         startAnchor.position = StartPoint;
         startAnchor.SetParent(AnchorContainer);
     }
 
-    private void CreateEndAnchor()
+    public void TakeStartAnchorFromSplineEndAnchor(BezierSpline spline)
+    {
+        startAnchor = spline.EndAnchor;
+    }
+
+    public void CreateEndAnchor()
     {
         endAnchor = new GameObject("EndAnchor").transform;
         endAnchor.position = EndPoint;

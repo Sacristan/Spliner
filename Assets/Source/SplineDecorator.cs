@@ -76,8 +76,6 @@ public class SplineDecorator : MonoBehaviour
 
     private void HandleLengthChange()
     {
-        Debug.Log("HandleLengthChange");
-
         Cleanup();
         Generate();
     }
