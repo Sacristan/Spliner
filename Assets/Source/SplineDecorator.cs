@@ -1,36 +1,106 @@
 ﻿using UnityEngine;
+using System.Collections;
 
-public class SplineDecorator : MonoBehaviour {
+public class SplineDecorator : MonoBehaviour
+{
+    private BezierSpline spline;
+    public Transform itemToSpawn;
 
-	public BezierSpline spline;
+    private const float DISTANCE_PER_KNOB = 75f;
 
-	public int frequency;
+    float lastLength = 0f;
+    float lastLegthInFrame = 0f;
 
-	public bool lookForward;
+    bool inChange = false;
 
-	public Transform[] items;
+    private BezierSpline Spline
+    {
+        get
+        {
+            if (spline == null) spline = GetComponent<BezierSpline>();
+            return spline;
+        }
+    }
 
-	private void Awake () {
-		if (frequency <= 0 || items == null || items.Length == 0) {
-			return;
-		}
-		float stepSize = frequency * items.Length;
-		if (spline.Loop || stepSize == 1) {
-			stepSize = 1f / stepSize;
-		}
-		else {
-			stepSize = 1f / (stepSize - 1);
-		}
-		for (int p = 0, f = 0; f < frequency; f++) {
-			for (int i = 0; i < items.Length; i++, p++) {
-				Transform item = Instantiate(items[i]) as Transform;
-				Vector3 position = spline.GetPoint(p * stepSize);
-				item.transform.localPosition = position;
-				if (lookForward) {
-					item.transform.LookAt(position + spline.GetDirection(p * stepSize));
-				}
-				item.transform.parent = transform;
-			}
-		}
-	}
+    private float StepSize
+    {
+        get
+        {
+            return Spline.Length / DISTANCE_PER_KNOB;
+        }
+    }
+
+    private int PointsRequiredOnSpline
+    {
+        get
+        {
+            return Mathf.FloorToInt(StepSize);
+        }
+    }
+
+    private Transform[] Children
+    {
+        get
+        {
+            return GetComponentsInChildren<Transform>();
+        }
+    }
+
+    private void Awake()
+    {
+        InvokeRepeating("HandleLengthChangeIfRequired", 0f, 0.5f);
+    }
+
+    void HandleLengthChangeIfRequired()
+    {
+        bool lengthChanged = lastLength != Spline.Length;
+
+        if (lengthChanged)
+        {
+            inChange = true;
+            lastLength = Spline.Length;
+        }
+        else
+        {
+            if (inChange)
+                HandleLengthChange();
+
+            inChange = false;
+        }
+    }
+
+    private void HandleLengthChange()
+    {
+        Debug.Log("HandleLengthChange");
+
+        Cleanup();
+        Generate();
+    }
+
+    private void Cleanup()
+    {
+        foreach (Transform child in Children)
+        {
+            if (child == transform) continue;
+            Destroy(child.gameObject);
+        }
+    }
+
+    private void Generate()
+    {
+        float stepSize = 1f / StepSize;
+
+        for (int i = 0; i < PointsRequiredOnSpline; i++)
+        {
+            Transform itemSpawned = Instantiate(itemToSpawn) as Transform;
+
+            float stepNormalized = (i * stepSize);
+            Vector3 position = spline.GetPoint(stepNormalized);
+
+            itemSpawned.transform.localPosition = position;
+            itemSpawned.transform.SetParent(transform);
+        }
+
+    }
+
 }
