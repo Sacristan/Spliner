@@ -21,15 +21,18 @@ public class BezierSplineInspector : Editor {
 	private int selectedIndex = -1;
 
 	public override void OnInspectorGUI () {
-		spline = target as BezierSpline;
+        //DrawDefaultInspector();
+
+        spline = target as BezierSpline;
 		EditorGUI.BeginChangeCheck();
-		bool loop = EditorGUILayout.Toggle("Loop", spline.Loop);
-		if (EditorGUI.EndChangeCheck()) {
-			Undo.RecordObject(spline, "Toggle Loop");
-			EditorUtility.SetDirty(spline);
-			spline.Loop = loop;
-		}
-		if (selectedIndex >= 0 && selectedIndex < spline.ControlPointCount) {
+        bool createAnchorsOnAwake = EditorGUILayout.Toggle("Create Anchors On Awake", spline.CreateAnchorsOnAwake);
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(spline, "Toggle Anchors On Awake");
+            EditorUtility.SetDirty(spline);
+            spline.CreateAnchorsOnAwake = createAnchorsOnAwake;
+        }
+        if (selectedIndex >= 0 && selectedIndex < spline.ControlPointCount) {
 			DrawSelectedPointInspector();
 		}
 		if (GUILayout.Button("Add Curve")) {
