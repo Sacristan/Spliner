@@ -7,12 +7,17 @@ public class Anchor : MonoBehaviour
 
     public static Anchor Create(AnchorManager manager)
     {
-        GameObject anchorGO = Instantiate(manager.anchorTemplate) as GameObject;
+        GameObject anchorGO = Instantiate(manager.anchorTemplate.gameObject) as GameObject;
         Anchor anchor = anchorGO.GetComponent<Anchor>();
         anchor.anchorManager = manager;
-        anchor.transform.SetParent(manager.transform);
-        anchor.transform.localPosition = Vector3.zero;
+        anchor.Setup();
         return anchor;
+    }
+
+    private void Setup()
+    {
+        transform.SetParent(anchorManager.transform);
+        transform.localPosition = Vector3.right * Random.Range(50, 800);
     }
 
     void OnDestroy()

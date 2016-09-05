@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(BezierSpline))]
 public class SplineDecorator : MonoBehaviour
 {
     private BezierSpline spline;
@@ -9,7 +10,6 @@ public class SplineDecorator : MonoBehaviour
     private const float DISTANCE_PER_KNOB = 75f;
 
     float lastLength = 0f;
-    float lastLegthInFrame = 0f;
 
     bool inChange = false;
 

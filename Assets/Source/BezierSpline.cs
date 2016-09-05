@@ -9,8 +9,43 @@ public class BezierSpline : MonoBehaviour
     [SerializeField]
     private BezierControlPointMode[] modes;
 
-    [SerializeField]
     private bool loop;
+
+    private Transform startAnchor;
+    private Transform endAnchor;
+
+    void Awake()
+    {
+        startAnchor = GameObject.Find("StartAnchor").transform;
+        endAnchor = GameObject.Find("EndAnchor").transform;
+    }
+
+    void Update()
+    {
+        Debug.DrawLine(StartPoint, EndPoint, Color.red);
+
+        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.position));
+        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.position));
+    }
+
+    private Transform StartAnchor
+    {
+        get { return startAnchor; }
+    }
+
+    private Transform EndAnchor
+    {
+        get { return endAnchor; }
+    }
+
+    public Vector3 StartPoint {
+        get { return GetPoint(0f); }
+    }
+
+    public Vector3 EndPoint
+    {
+        get { return GetPoint(1f); }
+    }
 
     public bool Loop
     {

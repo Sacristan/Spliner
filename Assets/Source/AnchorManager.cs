@@ -6,8 +6,10 @@ public class AnchorManager : MonoBehaviour
     [SerializeField]
     private List<Anchor> anchors = new List<Anchor>();
 
-    public GameObject anchorTemplate;
     public List<Anchor> Anchors { get { return anchors; } }
+
+    public Anchor anchorTemplate;
+    public BezierSpline splineTemplate;
 
     public void AddAnchor()
     {
@@ -20,4 +22,19 @@ public class AnchorManager : MonoBehaviour
         anchors.Remove(anchor);
         Destroy(anchor.gameObject);
     }
+
+    public Anchor AnchorAtIndex(int index)
+    {
+        Anchor anchor = null;
+        if (index >= 0 && Anchors.Count > index) anchor = Anchors[index];
+        return anchor;
+    }
+
+    public int IndexForAnchor(Anchor anchor)
+    {
+        int result = -1;
+        result = Anchors.IndexOf(anchor);
+        return result;
+    }
+
 }
