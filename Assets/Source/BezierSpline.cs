@@ -3,7 +3,6 @@ using System;
 
 public class BezierSpline : MonoBehaviour
 {
-
     [SerializeField]
     private Vector3[] points;
 
@@ -27,6 +26,19 @@ public class BezierSpline : MonoBehaviour
                 modes[modes.Length - 1] = modes[0];
                 SetControlPoint(0, points[0]);
             }
+        }
+    }
+
+    public float Length
+    {
+        get
+        {
+            float result = 0f;
+            for (int i = 1; i < points.Length; i++)
+            {
+                result += Vector3.Distance(points[i - 1], points[i]);
+            }
+            return result;
         }
     }
 

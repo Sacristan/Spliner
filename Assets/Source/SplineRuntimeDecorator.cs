@@ -2,48 +2,65 @@
 
 public class SplineRuntimeDecorator : MonoBehaviour
 {
+    private BezierSpline spline;
+    public Transform itemToSpawn;
 
-    public BezierSpline spline;
+    private const float DISTANCE_PER_KNOB = 75f;
 
-    public int frequency;
+    private BezierSpline Spline
+    {
+        get
+        {
+            if (spline == null) spline = GetComponent<BezierSpline>();
+            return spline;
+        }
+    }
 
-    public bool lookForward;
+    private float StepSize
+    {
+        get
+        {
+            return Spline.Length / DISTANCE_PER_KNOB;
+        }
+    }
 
-    public Transform[] items;
+    private int PointsRequiredOnSpline
+    {
+        get
+        {
+            return Mathf.FloorToInt(StepSize);
+        }
+    }
 
     private void Awake()
     {
         Generate();
     }
 
+    void Update()
+    {
+        Debug.Log("Spline length: "+ Spline.Length);
+    }
+
     private void Generate()
     {
-        if (frequency <= 0 || items == null || items.Length == 0)
-        {
-            return;
-        }
-        float stepSize = frequency * items.Length;
-        if (spline.Loop || stepSize == 1)
-        {
-            stepSize = 1f / stepSize;
-        }
-        else
-        {
-            stepSize = 1f / (stepSize - 1);
-        }
-        for (int p = 0, f = 0; f < frequency; f++)
-        {
-            for (int i = 0; i < items.Length; i++, p++)
-            {
-                Transform item = Instantiate(items[i]) as Transform;
-                Vector3 position = spline.GetPoint(p * stepSize);
-                item.transform.localPosition = position;
-                if (lookForward)
-                    item.transform.LookAt(position + spline.GetDirection(p * stepSize));
+        float stepSize = 1f / StepSize;
 
-                item.transform.SetParent(transform);
-            }
+        for(int i =0; i < PointsRequiredOnSpline; i++)
+        {
+            Transform itemSpawned = Instantiate(itemToSpawn) as Transform;
+
+
+            float normalStep = (i * stepSize);
+
+            Debug.Log(normalStep);
+
+            Vector3 position = spline.GetPoint(normalStep);
+
+            itemSpawned.transform.localPosition = position;
+            itemSpawned.transform.SetParent(transform);
         }
+
     }
 
 }
