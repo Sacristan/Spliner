@@ -38,11 +38,16 @@ public class SplineDecorator : MonoBehaviour
         }
     }
 
+    private Transform DecoratorContainer
+    {
+        get { return spline.DecoratorContainer; }
+    }
+
     private Transform[] Children
     {
         get
         {
-            return GetComponentsInChildren<Transform>();
+            return DecoratorContainer.GetComponentsInChildren<Transform>();
         }
     }
 
@@ -81,7 +86,7 @@ public class SplineDecorator : MonoBehaviour
     {
         foreach (Transform child in Children)
         {
-            if (child == transform) continue;
+            if (child == DecoratorContainer) continue;
             Destroy(child.gameObject);
         }
     }
@@ -98,7 +103,7 @@ public class SplineDecorator : MonoBehaviour
             Vector3 position = spline.GetPoint(stepNormalized);
 
             itemSpawned.transform.localPosition = position;
-            itemSpawned.transform.SetParent(transform);
+            itemSpawned.transform.SetParent(spline.DecoratorContainer);
         }
 
     }

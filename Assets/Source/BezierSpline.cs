@@ -11,17 +11,22 @@ public class BezierSpline : MonoBehaviour
 
     private bool loop;
 
+    private Transform anchorContainer;
+    private Transform decoratorContainer;
+
     private Transform startAnchor;
     private Transform endAnchor;
 
+    private bool isDirty = true;
+
     void Awake()
     {
-        startAnchor = GameObject.Find("StartAnchor").transform;
-        endAnchor = GameObject.Find("EndAnchor").transform;
+        Init();
     }
 
     void Update()
     {
+        if (isDirty) return;
         Debug.DrawLine(StartPoint, EndPoint, Color.red);
 
         SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.position));
@@ -36,6 +41,32 @@ public class BezierSpline : MonoBehaviour
     private Transform EndAnchor
     {
         get { return endAnchor; }
+    }
+
+    public Transform DecoratorContainer
+    {
+        get
+        {
+            if (decoratorContainer == null)
+            {
+                decoratorContainer = new GameObject("Decorators").transform;
+                decoratorContainer.SetParent(transform);
+            }
+            return decoratorContainer;
+        }
+    }
+
+    public Transform AnchorContainer
+    {
+        get
+        {
+            if (anchorContainer == null)
+            {
+                anchorContainer = new GameObject("Anchors").transform;
+                anchorContainer.SetParent(transform);
+            }
+            return anchorContainer;
+        }
     }
 
     public Vector3 StartPoint {
@@ -285,5 +316,20 @@ public class BezierSpline : MonoBehaviour
             BezierControlPointMode.Free,
             BezierControlPointMode.Free
         };
+    }
+
+
+    private void Init()
+    {
+        startAnchor = new GameObject("StartAnchor").transform;
+        endAnchor = new GameObject("EndAnchor").transform;
+
+        startAnchor.position = StartPoint;
+        endAnchor.position = EndPoint;
+
+        startAnchor.SetParent(AnchorContainer);
+        endAnchor.SetParent(AnchorContainer);
+
+        isDirty = false;
     }
 }
