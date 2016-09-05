@@ -19,9 +19,22 @@ public class BezierSpline : MonoBehaviour
 
     private bool isDirty = true;
 
+    SplineManager splineManager;
+
+    BezierSpline nextSpline;
+    BezierSpline prevSpline;
+
+    [SerializeField]
+    private bool createAnchorsOnAwake = false;
+
     void Awake()
     {
-        Init();
+        if (createAnchorsOnAwake)
+        {
+            CreateStartAnchor();
+            CreateEndAnchor();
+            isDirty = false;
+        }
     }
 
     void Update()
@@ -33,12 +46,12 @@ public class BezierSpline : MonoBehaviour
         SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.position));
     }
 
-    private Transform StartAnchor
+    public Transform StartAnchor
     {
         get { return startAnchor; }
     }
 
-    private Transform EndAnchor
+    public Transform EndAnchor
     {
         get { return endAnchor; }
     }
@@ -78,6 +91,12 @@ public class BezierSpline : MonoBehaviour
         get { return GetPoint(1f); }
     }
 
+    public bool CreateAnchorsOnAwake
+    {
+        get { return createAnchorsOnAwake; }
+        set { createAnchorsOnAwake = value;  }
+    }
+
     public bool Loop
     {
         get
@@ -114,6 +133,54 @@ public class BezierSpline : MonoBehaviour
         {
             return points.Length;
         }
+    }
+    private int Index
+    {
+        get
+        {
+            return splineManager.IndexForSpline(this);
+        }
+    }
+
+    private BezierSpline NextSpline
+    {
+        get { return splineManager.SplineAtIndex(Index + 1); }
+    }
+
+    private BezierSpline PrevSpline
+    {
+        get { return splineManager.SplineAtIndex(Index - 1); }
+    }
+    
+    public void Init(SplineManager manager=null)
+    {
+        splineManager = manager;
+
+        if (manager == null || PrevSpline==null)
+        {
+            CreateStartAnchor();
+        }
+        else
+        {
+            startAnchor = PrevSpline.EndAnchor;
+        }
+
+        CreateEndAnchor();
+        isDirty = false;
+    }
+
+    private void CreateStartAnchor()
+    {
+        startAnchor = new GameObject("StartAnchor").transform;
+        startAnchor.position = StartPoint;
+        startAnchor.SetParent(AnchorContainer);
+    }
+
+    private void CreateEndAnchor()
+    {
+        endAnchor = new GameObject("EndAnchor").transform;
+        endAnchor.position = EndPoint;
+        endAnchor.SetParent(AnchorContainer);
     }
 
     public Vector3 GetControlPoint(int index)
@@ -319,17 +386,4 @@ public class BezierSpline : MonoBehaviour
     }
 
 
-    private void Init()
-    {
-        startAnchor = new GameObject("StartAnchor").transform;
-        endAnchor = new GameObject("EndAnchor").transform;
-
-        startAnchor.position = StartPoint;
-        endAnchor.position = EndPoint;
-
-        startAnchor.SetParent(AnchorContainer);
-        endAnchor.SetParent(AnchorContainer);
-
-        isDirty = false;
-    }
 }

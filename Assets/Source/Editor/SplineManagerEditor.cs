@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(AnchorManager))]
-public class AnchorManagerEditor : Editor
+[CustomEditor(typeof(SplineManager))]
+public class SplineManagerEditor : Editor
 {
-    AnchorManager t;
+    SplineManager t;
     SerializedObject GetTarget;
 
     void OnEnable()
     {
-        t = (AnchorManager)target;
+        t = (SplineManager)target;
     }
 
     public override void OnInspectorGUI()
@@ -21,23 +21,24 @@ public class AnchorManagerEditor : Editor
         EditorGUILayout.Space();
         EditorGUILayout.Space();
 
-        if (GUILayout.Button("Add Node"))
+        if (GUILayout.Button("Add"))
         {
-            t.AddAnchor();
+            t.AddSpline();
         }
 
         EditorGUILayout.Space();
         EditorGUILayout.Space();
 
-        for (int i = 0; i < t.Anchors.Count; i++)
+        for (int i = 0; i < t.Splines.Count; i++)
         {
-            Anchor anchor = t.Anchors[i];
-            if (anchor == null) continue;
+            BezierSpline spline = t.Splines[i];
+
+            if (spline == null) continue;
             GUILayout.BeginHorizontal();
-            GUILayout.Label(anchor.gameObject.name);
+            GUILayout.Label(spline.gameObject.name);
 
             if (GUILayout.Button("X"))
-                t.RemoveAnchor(anchor);
+                t.RemoveSpline(spline);
 
             GUILayout.EndHorizontal();
         }
