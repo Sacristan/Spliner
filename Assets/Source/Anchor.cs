@@ -10,10 +10,8 @@ public class Anchor : MonoBehaviour
     [SerializeField]
     List<BezierSpline> outgoingSplines = new List<BezierSpline>();
 
-
     [SerializeField]
     private Anchor _nextAnchor;
-
 
     public BezierSpline[] IncomingSplines
     {

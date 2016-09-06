@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 
 [CustomEditor(typeof(Anchor))]
 public class AnchorEditor : Editor
@@ -44,5 +45,8 @@ public class AnchorEditor : Editor
             EditorUtility.SetDirty(targetAnchor);
             targetAnchor.NextAnchor = nextAnchor;
         }
+        //EditorSceneManager.MarkAllScenesDirty();
+
+
     }
 }
