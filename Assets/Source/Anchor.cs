@@ -20,28 +20,56 @@ public class Anchor : MonoBehaviour
 
     public Anchor NextAnchor
     {
-        get {
-
+        get
+        {
             return _nextAnchor;
         }
-        set {
+        set
+        {
             _nextAnchor = value;
 
-            if (_nextAnchor != null)
+            if (_nextAnchor == null)
             {
+                CleanupSplines();
+            }
+            else
+            {
+                CleanupSplines();
                 BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
                 splines.Add(spline);
             }
-        }
-    }
 
-    void OnGUI()
-    {
+        }
     }
 
     void OnDestroy()
     {
-        foreach (BezierSpline spline in splines)
-            if(spline!=null) Destroy(spline.gameObject);
+        CleanupSplines();
     }
+
+    public void CleanupSplines()
+    {
+        if (Application.isPlaying) return;
+
+        foreach (BezierSpline spline in Splines)
+            if (spline != null) DestroyImmediate(spline.gameObject);
+    }
+
+    public void HandleSplines()
+    {
+        if (NextAnchor == null)
+        {
+            CleanupSplines();
+        }
+        else
+        {
+            foreach (BezierSpline spline in this.Splines)
+            {
+                if (spline == null) continue;
+                spline.SplineDecorator.GenerateKnobs();
+            }
+        }
+
+    }
+
 }

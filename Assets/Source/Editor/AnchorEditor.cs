@@ -24,14 +24,8 @@ public class AnchorEditor : Editor
                 Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
             }
 
-            foreach (BezierSpline spline in anchor.Splines)
-            {
-                if (spline == null) continue;
-                spline.SplineDecorator.GenerateKnobs();
-            }
+            anchor.HandleSplines();
         }
-
-
 
     }
 
@@ -46,9 +40,10 @@ public class AnchorEditor : Editor
             Undo.RecordObject(targetAnchor, "Add NextAnchor");
             EditorUtility.SetDirty(targetAnchor);
             targetAnchor.NextAnchor = nextAnchor;
+
         }
 
-
+        targetAnchor.HandleSplines();
 
     }
 }
