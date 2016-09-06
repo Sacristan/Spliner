@@ -18,10 +18,20 @@ public class BezierSpline : MonoBehaviour
     private Anchor _endAnchor;
 
     SplineManager splineManager;
+    SplineDecorator splineDecorator;
 
     public bool IsDirty
     {
         get { return StartAnchor == null || EndAnchor == null; }
+    }
+
+    public SplineDecorator SplineDecorator
+    {
+        get
+        {
+            if (splineDecorator == null) splineDecorator = GetComponent<SplineDecorator>();
+            return splineDecorator;
+        }
     }
 
     void Update()
@@ -56,7 +66,8 @@ public class BezierSpline : MonoBehaviour
         }
     }
 
-    public Vector3 StartPoint {
+    public Vector3 StartPoint
+    {
         get { return GetPoint(0f); }
     }
 

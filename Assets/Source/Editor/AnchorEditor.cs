@@ -24,14 +24,22 @@ public class AnchorEditor : Editor
                 Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
             }
 
+            foreach (BezierSpline spline in anchor.Splines)
+            {
+                if (spline == null) continue;
+                spline.SplineDecorator.GenerateKnobs();
+            }
         }
+
+
+
     }
 
     public override void OnInspectorGUI()
     {
         EditorGUI.BeginChangeCheck();
 
-        Anchor nextAnchor = (Anchor) EditorGUILayout.ObjectField("Next Anchor: ", targetAnchor.NextAnchor, typeof(Anchor), true);
+        Anchor nextAnchor = (Anchor)EditorGUILayout.ObjectField("Next Anchor: ", targetAnchor.NextAnchor, typeof(Anchor), true);
 
         if (EditorGUI.EndChangeCheck())
         {
@@ -39,6 +47,8 @@ public class AnchorEditor : Editor
             EditorUtility.SetDirty(targetAnchor);
             targetAnchor.NextAnchor = nextAnchor;
         }
+
+
 
     }
 }

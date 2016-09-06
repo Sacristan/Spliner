@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[ExecuteInEditMode]
 [RequireComponent(typeof(BezierSpline))]
+[ExecuteInEditMode]
 public class SplineDecorator : MonoBehaviour
 {
     private BezierSpline spline;
@@ -50,46 +50,34 @@ public class SplineDecorator : MonoBehaviour
 
     void Awake()
     {
-        //Debug.Log("Awake");
-        //InvokeRepeating("HandleLengthChangeIfRequired", 0f, 0.5f);
-        HandleLengthChange();
+        GenerateKnobs();
     }
 
-    void HandleLengthChangeIfRequired()
+
+    //void HandleLengthChangeIfRequired()
+    //{
+    //    Debug.Log("HandleLengthChangeIfRequired");
+    //    bool lengthChanged = lastLength != Spline.Length;
+
+    //    if (lengthChanged)
+    //    {
+    //        inChange = true;
+    //        lastLength = Spline.Length;
+    //    }
+    //    else
+    //    {
+    //        if (inChange)
+    //            Generate();
+
+    //        inChange = false;
+    //    }
+    //}
+
+    public void GenerateKnobs()
     {
-        Debug.Log("HandleLengthChangeIfRequired");
-        bool lengthChanged = lastLength != Spline.Length;
-
-        if (lengthChanged)
-        {
-            inChange = true;
-            lastLength = Spline.Length;
-        }
-        else
-        {
-            if (inChange)
-                HandleLengthChange();
-
-            inChange = false;
-        }
-    }
-
-    private void HandleLengthChange()
-    {
+        if (Application.isPlaying) return;
         Cleanup();
-        Generate();
-    }
 
-    private void Cleanup()
-    {
-        foreach (Transform child in DecoratorContainer.transform)
-        {
-            Destroy(child.gameObject);
-        }
-    }
-
-    private void Generate()
-    {
         float stepSize = 1f / StepSize;
         //float offSetNormalized = 1f / OFFET_FROM_BORDERS;
 
@@ -106,6 +94,14 @@ public class SplineDecorator : MonoBehaviour
             itemSpawned.transform.SetParent(spline.DecoratorContainer);
         }
 
+    }
+
+    private void Cleanup()
+    {
+        foreach (Transform child in DecoratorContainer.transform)
+        {
+            DestroyImmediate(child.gameObject);
+        }
     }
 
 }

@@ -29,11 +29,11 @@ public class BezierSplineInspector : Editor {
         if (selectedIndex >= 0 && selectedIndex < spline.ControlPointCount) {
 			DrawSelectedPointInspector();
 		}
-		if (GUILayout.Button("Add Curve")) {
-			Undo.RecordObject(spline, "Add Curve");
-			spline.AddCurve();
-			EditorUtility.SetDirty(spline);
-		}
+		//if (GUILayout.Button("Add Curve")) {
+		//	Undo.RecordObject(spline, "Add Curve");
+		//	spline.AddCurve();
+		//	EditorUtility.SetDirty(spline);
+		//}
 	}
 
 	private void DrawSelectedPointInspector() {
@@ -59,8 +59,13 @@ public class BezierSplineInspector : Editor {
 		handleTransform = spline.transform;
 		handleRotation = Tools.pivotRotation == PivotRotation.Local ?
 			handleTransform.rotation : Quaternion.identity;
-		
-		Vector3 p0 = ShowPoint(0);
+
+        if (Event.current.type == EventType.MouseUp)
+        {
+            spline.SplineDecorator.GenerateKnobs();
+        }
+
+        Vector3 p0 = ShowPoint(0);
 		for (int i = 1; i < spline.ControlPointCount; i += 3) {
 			Vector3 p1 = ShowPoint(i);
 			Vector3 p2 = ShowPoint(i + 1);

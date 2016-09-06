@@ -5,10 +5,18 @@ using System.Collections.Generic;
 public class Anchor : MonoBehaviour
 {
     [SerializeField]
-    BezierSpline[] splines;
+    List<BezierSpline> splines = new List<BezierSpline>();
 
     [SerializeField]
     private Anchor _nextAnchor;
+
+    public BezierSpline[] Splines
+    {
+        get
+        {
+            return splines.ToArray();
+        }
+    }
 
     public Anchor NextAnchor
     {
@@ -21,7 +29,8 @@ public class Anchor : MonoBehaviour
 
             if (_nextAnchor != null)
             {
-                SplineManager.AddSpline(this, _nextAnchor);
+                BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
+                splines.Add(spline);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+[ExecuteInEditMode]
 public class BezierCurve : MonoBehaviour {
 
 	public Vector3[] points;
