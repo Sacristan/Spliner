@@ -84,12 +84,12 @@ public class SplineDecorator : MonoBehaviour
     private void Generate()
     {
         float stepSize = 1f / StepSize;
-        float offSetNormalized = 1f / OFFET_FROM_BORDERS;
+        //float offSetNormalized = 1f / OFFET_FROM_BORDERS;
 
         for (int i = 0; i < PointsRequiredOnSpline; i++)
         {
             float stepNormalized = (i * stepSize);
-            if (stepNormalized < offSetNormalized || stepNormalized >= (1 - offSetNormalized)) continue;
+            //if (stepNormalized < offSetNormalized || stepNormalized >= (1 - offSetNormalized)) continue;
 
             Transform itemSpawned = Instantiate(itemToSpawn) as Transform;
 
