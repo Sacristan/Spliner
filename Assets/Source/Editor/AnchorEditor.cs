@@ -6,10 +6,14 @@ using UnityEditor.SceneManagement;
 public class AnchorEditor : Editor
 {
     Anchor targetAnchor;
+    SerializedObject SerializedTargetAnchor;
+    SerializedProperty NextAnchorProperty;
 
     void OnEnable()
     {
         targetAnchor = (Anchor)target;
+        SerializedTargetAnchor = new SerializedObject(targetAnchor);
+        NextAnchorProperty = SerializedTargetAnchor.FindProperty("_nextAnchor");
     }
 
     private void OnSceneGUI()
@@ -32,21 +36,17 @@ public class AnchorEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        //DrawDefaultInspector();
-
         targetAnchor.HandleSplines();
 
-        EditorGUI.BeginChangeCheck();
 
-        Anchor nextAnchor = (Anchor)EditorGUILayout.ObjectField("Next Anchor: ", targetAnchor.NextAnchor, typeof(Anchor), true);
+        EditorGUI.BeginChangeCheck();
+        EditorGUILayout.PropertyField(NextAnchorProperty);
 
         if (EditorGUI.EndChangeCheck())
         {
-            EditorUtility.SetDirty(targetAnchor);
-            targetAnchor.NextAnchor = nextAnchor;
+            SerializedTargetAnchor.ApplyModifiedProperties();
+            targetAnchor.HandleNextAnchorChange();
         }
-        //EditorSceneManager.MarkAllScenesDirty();
-
 
     }
 }

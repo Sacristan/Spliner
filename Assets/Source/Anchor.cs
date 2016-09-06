@@ -35,21 +35,20 @@ public class Anchor : MonoBehaviour
         {
             return _nextAnchor;
         }
-        set
+    }
+
+    public void HandleNextAnchorChange()
+    {
+        CleanupSplines();
+
+        if (_nextAnchor != null)
         {
-            CleanupSplines();
-
-            if (value == this) return;
-            _nextAnchor = value;
-
-            if (_nextAnchor != null)
-            {
-                BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
-                outgoingSplines.Add(spline);
-                _nextAnchor.AddIncomingSpline(spline);
-            }
+            BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
+            outgoingSplines.Add(spline);
+            _nextAnchor.AddIncomingSpline(spline);
         }
     }
+
 
     void OnDestroy()
     {
