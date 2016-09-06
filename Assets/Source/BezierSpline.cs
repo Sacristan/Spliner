@@ -14,8 +14,8 @@ public class BezierSpline : MonoBehaviour
     private Transform anchorContainer;
     private Transform decoratorContainer;
 
-    private Transform startAnchor;
-    private Transform endAnchor;
+    private Anchor _startAnchor;
+    private Anchor _endAnchor;
 
     private bool isDirty = true;
 
@@ -26,36 +26,26 @@ public class BezierSpline : MonoBehaviour
 
     public bool IsDirty
     {
-        get { return startAnchor == null || endAnchor == null; }
-    }
-
-    void Awake()
-    {
-        if (createAnchorsOnAwake)
-        {
-            CreateStartAnchor();
-            CreateEndAnchor();
-            isDirty = false;
-        }
+        get { return StartAnchor == null || EndAnchor == null; }
     }
 
     void Update()
     {
         if (IsDirty) return;
-        Debug.DrawLine(StartPoint, EndPoint, Color.red);
+        Debug.DrawLine(StartPoint, EndPoint, Color.cyan);
 
-        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.position));
-        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.position));
+        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
+        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
     }
 
-    public Transform StartAnchor
+    public Anchor StartAnchor
     {
-        get { return startAnchor; }
+        get { return _startAnchor; }
     }
 
-    public Transform EndAnchor
+    public Anchor EndAnchor
     {
-        get { return endAnchor; }
+        get { return _endAnchor; }
     }
 
     public Transform DecoratorContainer
@@ -71,19 +61,6 @@ public class BezierSpline : MonoBehaviour
         }
     }
 
-    public Transform AnchorContainer
-    {
-        get
-        {
-            if (anchorContainer == null)
-            {
-                anchorContainer = new GameObject("Anchors").transform;
-                anchorContainer.SetParent(transform);
-            }
-            return anchorContainer;
-        }
-    }
-
     public Vector3 StartPoint {
         get { return GetPoint(0f); }
     }
@@ -91,12 +68,6 @@ public class BezierSpline : MonoBehaviour
     public Vector3 EndPoint
     {
         get { return GetPoint(1f); }
-    }
-
-    public bool CreateAnchorsOnAwake
-    {
-        get { return createAnchorsOnAwake; }
-        set { createAnchorsOnAwake = value;  }
     }
 
     public bool Loop
@@ -136,61 +107,11 @@ public class BezierSpline : MonoBehaviour
             return points.Length;
         }
     }
-    private int Index
+
+    public void Init(Anchor startAnchor, Anchor endAnchor)
     {
-        get
-        {
-            return splineManager.IndexForSpline(this);
-        }
-    }
-
-    private BezierSpline NextSpline
-    {
-        get { return splineManager.SplineAtIndex(Index + 1); }
-    }
-
-    private BezierSpline PrevSpline
-    {
-        get { return splineManager.SplineAtIndex(Index - 1); }
-    }
-    
-    public void Init(SplineManager manager=null)
-    {
-        //splineManager = manager;
-
-        //if (manager == null || PrevSpline==null)
-        //{
-        //    CreateStartAnchor();
-        //}
-        //else
-        //{
-        //    TakeStartAnchorFromSplineEndAnchor(PrevSpline);
-        //}
-
-        //CreateEndAnchor();
-    }
-
-    public void CreateStartAnchor()
-    {
-        startAnchor = Instantiate(splineManager.anchorTemplate).transform;
-        startAnchor.gameObject.name = "StartAnchor";
-
-        startAnchor.position = StartPoint;
-        startAnchor.SetParent(AnchorContainer);
-    }
-
-    public void TakeStartAnchorFromSplineEndAnchor(BezierSpline spline)
-    {
-        startAnchor = spline.EndAnchor;
-    }
-
-    public void CreateEndAnchor()
-    {
-        endAnchor = Instantiate(splineManager.anchorTemplate).transform;
-        endAnchor.gameObject.name = "EndAnchor";
-
-        endAnchor.position = EndPoint;
-        endAnchor.SetParent(AnchorContainer);
+        _startAnchor = startAnchor;
+        _endAnchor = endAnchor;
     }
 
     public Vector3 GetControlPoint(int index)

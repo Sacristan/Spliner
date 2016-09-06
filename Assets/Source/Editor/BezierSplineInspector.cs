@@ -25,13 +25,7 @@ public class BezierSplineInspector : Editor {
 
         spline = target as BezierSpline;
 		EditorGUI.BeginChangeCheck();
-        bool createAnchorsOnAwake = EditorGUILayout.Toggle("Create Anchors On Awake", spline.CreateAnchorsOnAwake);
-        if (EditorGUI.EndChangeCheck())
-        {
-            Undo.RecordObject(spline, "Toggle Anchors On Awake");
-            EditorUtility.SetDirty(spline);
-            spline.CreateAnchorsOnAwake = createAnchorsOnAwake;
-        }
+
         if (selectedIndex >= 0 && selectedIndex < spline.ControlPointCount) {
 			DrawSelectedPointInspector();
 		}

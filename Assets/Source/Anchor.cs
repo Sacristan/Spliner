@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class Anchor : MonoBehaviour
 {
@@ -10,6 +10,8 @@ public class Anchor : MonoBehaviour
 
     private static Anchor startAnchor;
     private static Anchor endAnchor;
+
+    protected List<BezierSpline> splines = new List<BezierSpline>();
 
     void OnGUI()
     {
@@ -26,7 +28,7 @@ public class Anchor : MonoBehaviour
         {
             if (GUI.Button(rect, "Create Spline"))
             {
-                StartAnchor();
+                StartSpline();
             }
         }
         else
@@ -34,20 +36,31 @@ public class Anchor : MonoBehaviour
             if (startAnchor == this) return;
             if (GUI.Button(rect, "Finish Spline"))
             {
-                EndAnchor();
+                FinishSpline ();
             }
         }
-
     }
 
-    void StartAnchor()
+
+    void OnDestroy()
+    {
+        foreach (BezierSpline spline in splines.ToArray())
+            if(spline!=null) Destroy(spline.gameObject);
+    }
+
+    void StartSpline()
     {
         startAnchor = this;
     }
 
-    void EndAnchor()
+    void FinishSpline()
     {
         endAnchor = this;
+
+        BezierSpline spline = SplineManager.AddSpline(startAnchor, endAnchor);
+
+        startAnchor.splines.Add(spline);
+        endAnchor.splines.Add(spline);
 
         startAnchor = null;
         endAnchor = null;
