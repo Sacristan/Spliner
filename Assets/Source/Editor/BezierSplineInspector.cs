@@ -60,10 +60,7 @@ public class BezierSplineInspector : Editor {
 		handleRotation = Tools.pivotRotation == PivotRotation.Local ?
 			handleTransform.rotation : Quaternion.identity;
 
-        if (Event.current.type == EventType.MouseUp)
-        {
-            spline.SplineDecorator.GenerateKnobs();
-        }
+        spline.SplineDecorator.GenerateKnobs();
 
         Vector3 p0 = ShowPoint(0);
 		for (int i = 1; i < spline.ControlPointCount; i += 3) {

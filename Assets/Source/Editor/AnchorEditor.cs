@@ -31,6 +31,8 @@ public class AnchorEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        targetAnchor.HandleSplines();
+
         EditorGUI.BeginChangeCheck();
 
         Anchor nextAnchor = (Anchor)EditorGUILayout.ObjectField("Next Anchor: ", targetAnchor.NextAnchor, typeof(Anchor), true);
@@ -38,12 +40,23 @@ public class AnchorEditor : Editor
         if (EditorGUI.EndChangeCheck())
         {
             Undo.RecordObject(targetAnchor, "Add NextAnchor");
+            Undo.undoRedoPerformed += targetAnchor.CleanupSplines;
+
             EditorUtility.SetDirty(targetAnchor);
             targetAnchor.NextAnchor = nextAnchor;
 
         }
 
-        targetAnchor.HandleSplines();
+        //if (Event.current.type == EventType.ValidateCommand)
+        //{
+        //    switch (Event.current.commandName)
+        //    {
+        //        case "UndoRedoPerformed":
+        //            targetAnchor.CleanupSplines();
+        //            break;
+        //    }
+        //}
+
 
     }
 }
