@@ -26,20 +26,25 @@ public class SplineManager : MonoBehaviour
         }
     }
 
-    void Awake()
-    {
-        if (singletone == null) singletone = this;
-        else Destroy(this);
-    }
+    private static SplineManager Singletone {
+        get
+        {
+            if(singletone == null)
+            {
+                singletone = FindObjectOfType<SplineManager>();
+            }
+            return singletone;
+        }
+     }
 
     public static BezierSpline AddSpline(Anchor startAnchor, Anchor endAnchor)
     {
-        GameObject splineGO = Instantiate(singletone.splineTemplate.gameObject) as GameObject;
+        GameObject splineGO = Instantiate(Singletone.splineTemplate.gameObject) as GameObject;
         BezierSpline spline = splineGO.GetComponent<BezierSpline>();
-        singletone.splines.Add(spline);
+        Singletone.splines.Add(spline);
 
         spline.Init(startAnchor, endAnchor);
-        spline.transform.SetParent(singletone.SplineContainer.transform);
+        spline.transform.SetParent(Singletone.SplineContainer.transform);
         spline.gameObject.name = "Spline_" + System.Guid.NewGuid();
         return spline;
     }

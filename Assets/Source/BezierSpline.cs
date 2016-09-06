@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
+[ExecuteInEditMode]
 public class BezierSpline : MonoBehaviour
 {
     [SerializeField]
@@ -11,18 +12,12 @@ public class BezierSpline : MonoBehaviour
 
     private bool loop;
 
-    private Transform anchorContainer;
     private Transform decoratorContainer;
 
     private Anchor _startAnchor;
     private Anchor _endAnchor;
 
-    private bool isDirty = true;
-
     SplineManager splineManager;
-
-    [SerializeField]
-    private bool createAnchorsOnAwake = false;
 
     public bool IsDirty
     {
@@ -31,7 +26,7 @@ public class BezierSpline : MonoBehaviour
 
     void Update()
     {
-        if (IsDirty) return;
+        if (Application.isPlaying || IsDirty) return;
         Debug.DrawLine(StartPoint, EndPoint, Color.cyan);
 
         SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));

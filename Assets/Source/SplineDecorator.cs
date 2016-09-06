@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[ExecuteInEditMode]
 [RequireComponent(typeof(BezierSpline))]
 public class SplineDecorator : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class SplineDecorator : MonoBehaviour
     float lastLength = 0f;
 
     bool inChange = false;
+
+    float handleLengthChangeCallRateInSeconds = 0.5f;
+    float handleLengthChangedLastCalled = 0f;
 
     private BezierSpline Spline
     {
@@ -41,16 +45,19 @@ public class SplineDecorator : MonoBehaviour
 
     private Transform DecoratorContainer
     {
-        get { return spline.DecoratorContainer; }
+        get { return Spline.DecoratorContainer; }
     }
 
-    private void Awake()
+    void Awake()
     {
-        InvokeRepeating("HandleLengthChangeIfRequired", 0f, 0.5f);
+        //Debug.Log("Awake");
+        //InvokeRepeating("HandleLengthChangeIfRequired", 0f, 0.5f);
+        HandleLengthChange();
     }
 
     void HandleLengthChangeIfRequired()
     {
+        Debug.Log("HandleLengthChangeIfRequired");
         bool lengthChanged = lastLength != Spline.Length;
 
         if (lengthChanged)
