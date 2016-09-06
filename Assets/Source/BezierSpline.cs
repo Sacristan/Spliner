@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
+[ExecuteInEditMode]
 public class BezierSpline : MonoBehaviour
 {
     [SerializeField]
@@ -11,55 +12,45 @@ public class BezierSpline : MonoBehaviour
 
     private bool loop;
 
-    private Transform anchorContainer;
     private Transform decoratorContainer;
 
-    private Transform startAnchor;
-    private Transform endAnchor;
-
-    private bool isDirty = true;
+    private Anchor _startAnchor;
+    private Anchor _endAnchor;
 
     SplineManager splineManager;
-
-    BezierSpline nextSpline;
-    BezierSpline prevSpline;
-
-    [SerializeField]
-    private bool createAnchorsOnAwake = false;
+    SplineDecorator splineDecorator;
 
     public bool IsDirty
     {
-        get { return isDirty; }
-        set { isDirty = value; }
+        get { return StartAnchor == null || EndAnchor == null; }
     }
 
-    void Awake()
+    public SplineDecorator SplineDecorator
     {
-        if (createAnchorsOnAwake)
+        get
         {
-            CreateStartAnchor();
-            CreateEndAnchor();
-            isDirty = false;
+            if (splineDecorator == null) splineDecorator = GetComponent<SplineDecorator>();
+            return splineDecorator;
         }
     }
 
     void Update()
     {
-        if (IsDirty) return;
-        Debug.DrawLine(StartPoint, EndPoint, Color.red);
+        if (Application.isPlaying || IsDirty) return;
+        Debug.DrawLine(StartPoint, EndPoint, Color.cyan);
 
-        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.position));
-        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.position));
+        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
+        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
     }
 
-    public Transform StartAnchor
+    public Anchor StartAnchor
     {
-        get { return startAnchor; }
+        get { return _startAnchor; }
     }
 
-    public Transform EndAnchor
+    public Anchor EndAnchor
     {
-        get { return endAnchor; }
+        get { return _endAnchor; }
     }
 
     public Transform DecoratorContainer
@@ -75,32 +66,14 @@ public class BezierSpline : MonoBehaviour
         }
     }
 
-    public Transform AnchorContainer
+    public Vector3 StartPoint
     {
-        get
-        {
-            if (anchorContainer == null)
-            {
-                anchorContainer = new GameObject("Anchors").transform;
-                anchorContainer.SetParent(transform);
-            }
-            return anchorContainer;
-        }
-    }
-
-    public Vector3 StartPoint {
         get { return GetPoint(0f); }
     }
 
     public Vector3 EndPoint
     {
         get { return GetPoint(1f); }
-    }
-
-    public bool CreateAnchorsOnAwake
-    {
-        get { return createAnchorsOnAwake; }
-        set { createAnchorsOnAwake = value;  }
     }
 
     public bool Loop
@@ -140,62 +113,11 @@ public class BezierSpline : MonoBehaviour
             return points.Length;
         }
     }
-    private int Index
+
+    public void Init(Anchor startAnchor, Anchor endAnchor)
     {
-        get
-        {
-            return splineManager.IndexForSpline(this);
-        }
-    }
-
-    private BezierSpline NextSpline
-    {
-        get { return splineManager.SplineAtIndex(Index + 1); }
-    }
-
-    private BezierSpline PrevSpline
-    {
-        get { return splineManager.SplineAtIndex(Index - 1); }
-    }
-    
-    public void Init(SplineManager manager=null)
-    {
-        splineManager = manager;
-
-        if (manager == null || PrevSpline==null)
-        {
-            CreateStartAnchor();
-        }
-        else
-        {
-            TakeStartAnchorFromSplineEndAnchor(PrevSpline);
-        }
-
-        CreateEndAnchor();
-        isDirty = false;
-    }
-
-    public void CreateStartAnchor()
-    {
-        startAnchor = Instantiate(splineManager.anchorTemplate).transform;
-        startAnchor.gameObject.name = "StartAnchor";
-
-        startAnchor.position = StartPoint;
-        startAnchor.SetParent(AnchorContainer);
-    }
-
-    public void TakeStartAnchorFromSplineEndAnchor(BezierSpline spline)
-    {
-        startAnchor = spline.EndAnchor;
-    }
-
-    public void CreateEndAnchor()
-    {
-        endAnchor = Instantiate(splineManager.anchorTemplate).transform;
-        endAnchor.gameObject.name = "EndAnchor";
-
-        endAnchor.position = EndPoint;
-        endAnchor.SetParent(AnchorContainer);
+        _startAnchor = startAnchor;
+        _endAnchor = endAnchor;
     }
 
     public Vector3 GetControlPoint(int index)

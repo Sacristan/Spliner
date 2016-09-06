@@ -1,66 +1,53 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+[ExecuteInEditMode]
 public class SplineManager : MonoBehaviour
 {
+    private static SplineManager singletone;
+
     [SerializeField]
     private List<BezierSpline> splines = new List<BezierSpline>();
+    public BezierSpline splineTemplate;
+
     public List<BezierSpline> Splines { get { return splines; } }
 
-    public BezierSpline splineTemplate;
-    public GameObject anchorTemplate;
+    private Transform _splineContainer;
 
-    public BezierSpline AddSpline()
+    private Transform SplineContainer
     {
-        GameObject splineGO = Instantiate(splineTemplate.gameObject) as GameObject;
-        BezierSpline spline = splineGO.GetComponent<BezierSpline>();
-        splines.Add(spline);
+        get
+        {
+            if (_splineContainer == null)
+            {
+                _splineContainer = new GameObject("Splines").transform;
+                _splineContainer.SetParent(transform);
+            }
+            return _splineContainer;
+        }
+    }
 
-        spline.Init(this);
-        spline.transform.SetParent(transform);
+    private static SplineManager Singletone {
+        get
+        {
+            if(singletone == null)
+            {
+                singletone = FindObjectOfType<SplineManager>();
+            }
+            return singletone;
+        }
+     }
+
+    public static BezierSpline AddSpline(Anchor startAnchor, Anchor endAnchor)
+    {
+        GameObject splineGO = Instantiate(Singletone.splineTemplate.gameObject) as GameObject;
+        BezierSpline spline = splineGO.GetComponent<BezierSpline>();
+        Singletone.splines.Add(spline);
+
+        spline.Init(startAnchor, endAnchor);
+        spline.transform.SetParent(Singletone.SplineContainer.transform);
         spline.gameObject.name = "Spline_" + System.Guid.NewGuid();
         return spline;
-    }
-
-    public void RemoveSpline(BezierSpline spline)
-    {
-        int index = IndexForSpline(spline);
-
-        BezierSpline prevSpline = SplineAtIndex(index - 1);
-        BezierSpline nextSpline = SplineAtIndex(index + 1);
-
-        if (prevSpline != null) prevSpline.IsDirty = true;
-        if (nextSpline != null) nextSpline.IsDirty = true;
-
-        if(prevSpline == null)
-        {
-            if(nextSpline!=null) nextSpline.CreateStartAnchor();
-        }
-        else
-        {
-            prevSpline.CreateEndAnchor();
-            if (nextSpline != null) nextSpline.TakeStartAnchorFromSplineEndAnchor(prevSpline);
-        }
-
-        splines.Remove(spline);
-        Destroy(spline.gameObject);
-
-        if (prevSpline != null) prevSpline.IsDirty = false;
-        if (nextSpline != null) nextSpline.IsDirty = false;
-    }
-
-    public BezierSpline SplineAtIndex(int index)
-    {
-        BezierSpline spline = null;
-        if (index >= 0 && Splines.Count > index) spline = Splines[index];
-        return spline;
-    }
-
-    public int IndexForSpline(BezierSpline spline)
-    {
-        int result = -1;
-        result = Splines.IndexOf(spline);
-        return result;
     }
 
 }
