@@ -44,14 +44,6 @@ public class SplineDecorator : MonoBehaviour
         get { return spline.DecoratorContainer; }
     }
 
-    private Transform[] Children
-    {
-        get
-        {
-            return DecoratorContainer.GetComponentsInChildren<Transform>();
-        }
-    }
-
     private void Awake()
     {
         InvokeRepeating("HandleLengthChangeIfRequired", 0f, 0.5f);
@@ -83,9 +75,8 @@ public class SplineDecorator : MonoBehaviour
 
     private void Cleanup()
     {
-        foreach (Transform child in Children)
+        foreach (Transform child in DecoratorContainer.transform)
         {
-            if (child == DecoratorContainer) continue;
             Destroy(child.gameObject);
         }
     }
@@ -97,11 +88,10 @@ public class SplineDecorator : MonoBehaviour
 
         for (int i = 0; i < PointsRequiredOnSpline; i++)
         {
-            Transform itemSpawned = Instantiate(itemToSpawn) as Transform;
-
             float stepNormalized = (i * stepSize);
+            if (stepNormalized < offSetNormalized || stepNormalized >= (1 - offSetNormalized)) continue;
 
-            if (stepNormalized < offSetNormalized || stepNormalized > (1 - offSetNormalized)) continue;
+            Transform itemSpawned = Instantiate(itemToSpawn) as Transform;
 
             Vector3 position = spline.GetPoint(stepNormalized);
 
