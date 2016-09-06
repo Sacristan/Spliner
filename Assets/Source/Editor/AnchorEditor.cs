@@ -31,6 +31,8 @@ public class AnchorEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        //DrawDefaultInspector();
+
         targetAnchor.HandleSplines();
 
         EditorGUI.BeginChangeCheck();
