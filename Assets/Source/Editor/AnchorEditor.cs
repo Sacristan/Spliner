@@ -39,24 +39,8 @@ public class AnchorEditor : Editor
 
         if (EditorGUI.EndChangeCheck())
         {
-            Undo.RecordObject(targetAnchor, "Add NextAnchor");
-            Undo.undoRedoPerformed += targetAnchor.CleanupSplines;
-
             EditorUtility.SetDirty(targetAnchor);
             targetAnchor.NextAnchor = nextAnchor;
-
         }
-
-        //if (Event.current.type == EventType.ValidateCommand)
-        //{
-        //    switch (Event.current.commandName)
-        //    {
-        //        case "UndoRedoPerformed":
-        //            targetAnchor.CleanupSplines();
-        //            break;
-        //    }
-        //}
-
-
     }
 }
