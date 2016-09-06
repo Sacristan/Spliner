@@ -26,6 +26,7 @@ public class Anchor : MonoBehaviour
         }
         set
         {
+            if (value == this) return;
             _nextAnchor = value;
 
             CleanupSplines();
