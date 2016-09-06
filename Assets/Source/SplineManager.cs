@@ -24,29 +24,29 @@ public class SplineManager : MonoBehaviour
 
     public void RemoveSpline(BezierSpline spline)
     {
-        int index = IndexForSpline(spline);
+        //int index = IndexForSpline(spline);
 
-        BezierSpline prevSpline = SplineAtIndex(index - 1);
-        BezierSpline nextSpline = SplineAtIndex(index + 1);
+        //BezierSpline prevSpline = SplineAtIndex(index - 1);
+        //BezierSpline nextSpline = SplineAtIndex(index + 1);
 
-        if (prevSpline != null) prevSpline.IsDirty = true;
-        if (nextSpline != null) nextSpline.IsDirty = true;
+        //if (prevSpline != null) prevSpline.IsDirty = true;
+        //if (nextSpline != null) nextSpline.IsDirty = true;
 
-        if(prevSpline == null)
-        {
-            if(nextSpline!=null) nextSpline.CreateStartAnchor();
-        }
-        else
-        {
-            prevSpline.CreateEndAnchor();
-            if (nextSpline != null) nextSpline.TakeStartAnchorFromSplineEndAnchor(prevSpline);
-        }
+        //if(prevSpline == null)
+        //{
+        //    if(nextSpline!=null) nextSpline.CreateStartAnchor();
+        //}
+        //else
+        //{
+        //    prevSpline.CreateEndAnchor();
+        //    if (nextSpline != null) nextSpline.TakeStartAnchorFromSplineEndAnchor(prevSpline);
+        //}
 
-        splines.Remove(spline);
-        Destroy(spline.gameObject);
+        //splines.Remove(spline);
+        //Destroy(spline.gameObject);
 
-        if (prevSpline != null) prevSpline.IsDirty = false;
-        if (nextSpline != null) nextSpline.IsDirty = false;
+        //if (prevSpline != null) prevSpline.IsDirty = false;
+        //if (nextSpline != null) nextSpline.IsDirty = false;
     }
 
     public BezierSpline SplineAtIndex(int index)

@@ -21,16 +21,12 @@ public class BezierSpline : MonoBehaviour
 
     SplineManager splineManager;
 
-    BezierSpline nextSpline;
-    BezierSpline prevSpline;
-
     [SerializeField]
     private bool createAnchorsOnAwake = false;
 
     public bool IsDirty
     {
-        get { return isDirty; }
-        set { isDirty = value; }
+        get { return startAnchor == null || endAnchor == null; }
     }
 
     void Awake()
@@ -160,19 +156,18 @@ public class BezierSpline : MonoBehaviour
     
     public void Init(SplineManager manager=null)
     {
-        splineManager = manager;
+        //splineManager = manager;
 
-        if (manager == null || PrevSpline==null)
-        {
-            CreateStartAnchor();
-        }
-        else
-        {
-            TakeStartAnchorFromSplineEndAnchor(PrevSpline);
-        }
+        //if (manager == null || PrevSpline==null)
+        //{
+        //    CreateStartAnchor();
+        //}
+        //else
+        //{
+        //    TakeStartAnchorFromSplineEndAnchor(PrevSpline);
+        //}
 
-        CreateEndAnchor();
-        isDirty = false;
+        //CreateEndAnchor();
     }
 
     public void CreateStartAnchor()
