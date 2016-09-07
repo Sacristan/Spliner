@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 
 [CustomEditor(typeof(Anchor))]
 public class AnchorEditor : Editor
 {
     Anchor targetAnchor;
+    SerializedObject SerializedTargetAnchor;
+    SerializedProperty NextAnchorProperty;
 
     void OnEnable()
     {
         targetAnchor = (Anchor)target;
+        SerializedTargetAnchor = new SerializedObject(targetAnchor);
+        NextAnchorProperty = SerializedTargetAnchor.FindProperty("_nextAnchor");
     }
 
     private void OnSceneGUI()
@@ -25,28 +28,23 @@ public class AnchorEditor : Editor
                 Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
             }
 
-            anchor.HandleSplines();
+            anchor.AddSplinesIfRequired();
+            anchor.DecorateOutgoingSplines();
         }
 
     }
 
     public override void OnInspectorGUI()
     {
-        //DrawDefaultInspector();
-
-        targetAnchor.HandleSplines();
-
+        targetAnchor.DecorateOutgoingSplines();
         EditorGUI.BeginChangeCheck();
-
-        Anchor nextAnchor = (Anchor)EditorGUILayout.ObjectField("Next Anchor: ", targetAnchor.NextAnchor, typeof(Anchor), true);
+        EditorGUILayout.PropertyField(NextAnchorProperty);
 
         if (EditorGUI.EndChangeCheck())
         {
-            EditorUtility.SetDirty(targetAnchor);
-            targetAnchor.NextAnchor = nextAnchor;
+            SerializedTargetAnchor.ApplyModifiedProperties();
+            targetAnchor.CleanupAndAddSplinesIfRequired();
         }
-        //EditorSceneManager.MarkAllScenesDirty();
-
 
     }
 }

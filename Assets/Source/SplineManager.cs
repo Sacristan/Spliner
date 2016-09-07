@@ -40,14 +40,57 @@ public class SplineManager : MonoBehaviour
 
     public static BezierSpline AddSpline(Anchor startAnchor, Anchor endAnchor)
     {
+        CleanupNullSplinesInList();
+
         GameObject splineGO = Instantiate(Singletone.splineTemplate.gameObject) as GameObject;
         BezierSpline spline = splineGO.GetComponent<BezierSpline>();
-        Singletone.splines.Add(spline);
 
         spline.Init(startAnchor, endAnchor);
+
+        Singletone.splines.Add(spline);
+
         spline.transform.SetParent(Singletone.SplineContainer.transform);
         spline.gameObject.name = "Spline_" + System.Guid.NewGuid();
         return spline;
+    }
+
+
+    public static void CleanupIncomingSplinesForAnchor(Anchor anchor)
+    {
+        CleanupNullSplinesInList();
+
+        foreach (BezierSpline spline in Singletone.splines.ToArray())
+        {
+            if (spline.EndAnchor == anchor)
+            {
+                spline.MarkForDestruction();
+                Singletone.splines.Remove(spline);
+            }
+        }
+    }
+
+    public static void CleanupOutgoingSplinesForAnchor(Anchor anchor)
+    {
+        CleanupNullSplinesInList();
+
+        foreach (BezierSpline spline in Singletone.splines.ToArray())
+        {
+            if (spline.StartAnchor == anchor)
+            {
+                spline.MarkForDestruction();
+                Singletone.splines.Remove(spline);
+            }
+        }
+    }
+
+    private static void CleanupNullSplinesInList()
+    {
+        Singletone.splines.RemoveAll(item => item == null);
+    }
+
+    private static void CleanupInactiveSplines()
+    {
+
     }
 
 }

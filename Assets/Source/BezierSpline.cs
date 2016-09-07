@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 
 [ExecuteInEditMode]
 public class BezierSpline : MonoBehaviour
@@ -119,6 +120,19 @@ public class BezierSpline : MonoBehaviour
         _startAnchor = startAnchor;
         _endAnchor = endAnchor;
     }
+    
+    public void MarkForDestruction()
+    {
+        DestroyImmediate(gameObject);
+        //IEnumerator e = DestroyMe();
+        //while (e.MoveNext()) ;
+    }
+
+    //private IEnumerator DestroyMe()
+    //{
+    //    yield return new WaitForSeconds(1f);
+    //    DestroyImmediate(gameObject);
+    //}
 
     public Vector3 GetControlPoint(int index)
     {
