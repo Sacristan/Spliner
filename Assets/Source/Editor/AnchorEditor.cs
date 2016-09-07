@@ -39,19 +39,20 @@ public class AnchorEditor : Editor
 
     }
 
-    public override void OnInspectorGUI()
-    {
-        targetAnchor.DecorateOutgoingSplines();
-        EditorGUI.BeginChangeCheck();
-        EditorGUILayout.PropertyField(NextAnchorProperty);
+    //public override void OnInspectorGUI()
+    //{
+    //    DrawDefaultInspector();
+    //    targetAnchor.DecorateOutgoingSplines();
+    //    EditorGUI.BeginChangeCheck();
+    //    EditorGUILayout.PropertyField(NextAnchorProperty);
 
-        if (EditorGUI.EndChangeCheck())
-        {
-            SerializedTargetAnchor.ApplyModifiedProperties();
-            targetAnchor.CleanupAndAddSplinesIfRequired();
-        }
+    //    if (EditorGUI.EndChangeCheck())
+    //    {
+    //        SerializedTargetAnchor.ApplyModifiedProperties();
+    //        targetAnchor.CleanupAndAddSplinesIfRequired();
+    //    }
 
-    }
+    //}
 
     private void DrawHandlesAndBezierSpline(BezierSpline spline)
     {
