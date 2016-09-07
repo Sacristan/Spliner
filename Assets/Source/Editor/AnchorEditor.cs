@@ -28,6 +28,7 @@ public class AnchorEditor : Editor
                 Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
             }
 
+            anchor.AddSplinesIfRequired();
             anchor.DecorateOutgoingSplines();
         }
 
@@ -42,7 +43,7 @@ public class AnchorEditor : Editor
         if (EditorGUI.EndChangeCheck())
         {
             SerializedTargetAnchor.ApplyModifiedProperties();
-            targetAnchor.AddSplinesIfRequired();
+            targetAnchor.CleanupAndAddSplinesIfRequired();
         }
 
     }

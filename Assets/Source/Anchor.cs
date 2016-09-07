@@ -46,12 +46,17 @@ public class Anchor : MonoBehaviour
 
     void OnValidate()
     {
-        //AddSplinesIfRequired();
+        AddSplinesIfRequired();
     }
 
     void OnDestroy()
     {
         CleanupSplines(true);
+    }
+
+    void OnEnable()
+    {
+        CleanupAndAddSplinesIfRequired();
     }
 
     void OnGUI()
@@ -83,11 +88,16 @@ public class Anchor : MonoBehaviour
         incomingSplines.Add(spline);
     }
 
-    public void AddSplinesIfRequired()
+    public void CleanupAndAddSplinesIfRequired()
     {
         CleanupSplines();
+        AddSplinesIfRequired();
+    }
 
-        if (_nextAnchor != null)
+    public void AddSplinesIfRequired()
+    {
+        RemoveRenundantSplinesFromArrays();
+        if (_nextAnchor != null && outgoingSplines.Count < 1)
         {
             BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
             outgoingSplines.Add(spline);
