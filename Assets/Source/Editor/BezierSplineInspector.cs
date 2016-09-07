@@ -65,9 +65,9 @@ public class BezierSplineInspector : Editor {
         handleRotation = Tools.pivotRotation == PivotRotation.Local ?
             handleTransform.rotation : Quaternion.identity;
 
-        spline.SplineDecorator.GenerateKnobs();
-
         Vector3 p0 = ShowPoint(0);
+
+        Debug.Log(spline.ControlPointCount);
 
         for (int i = 1; i < spline.ControlPointCount; i += 3)
         {
@@ -79,13 +79,17 @@ public class BezierSplineInspector : Editor {
             Handles.DrawLine(p0, p1);
             Handles.DrawLine(p2, p3);
 
+
             Handles.DrawBezier(p0, p3, p1, p2, Color.yellow, null, 2f);
+
             p0 = p3;
         }
         ShowDirections();
+
+        spline.SplineDecorator.GenerateKnobs();
     }
 
-	private void ShowDirections () {
+    private void ShowDirections () {
 		Handles.color = Color.green;
 		Vector3 point = spline.GetPoint(0f);
 		Handles.DrawLine(point, point + spline.GetDirection(0f) * directionScale);
@@ -107,15 +111,16 @@ public class BezierSplineInspector : Editor {
 			selectedIndex = index;
 			Repaint();
 		}
-		if (selectedIndex == index) {
-			EditorGUI.BeginChangeCheck();
-			point = Handles.DoPositionHandle(point, handleRotation);
-			if (EditorGUI.EndChangeCheck()) {
-				Undo.RecordObject(spline, "Move Point");
-				EditorUtility.SetDirty(spline);
-				spline.SetControlPoint(index, handleTransform.InverseTransformPoint(point));
-			}
-		}
-		return point;
+
+        EditorGUI.BeginChangeCheck();
+        point = Handles.FreeMoveHandle(point, handleRotation, 10f, Vector3.zero, Handles.RectangleCap);
+
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(spline, "Move Point");
+            EditorUtility.SetDirty(spline);
+            spline.SetControlPoint(index, handleTransform.InverseTransformPoint(point));
+        }
+        return point;
 	}
 }
