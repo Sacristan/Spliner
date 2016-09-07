@@ -96,18 +96,18 @@ public class Anchor : MonoBehaviour
 
     void OnGUI()
     {
-        if (Application.isPlaying) return;
-        int height = 25;
-        int width = 100;
+        //if (Application.isPlaying) return;
+        //int height = 25;
+        //int width = 100;
 
-        if (_nextAnchor == null)
-        {
-            Vector2 pos = Camera.main.transform.InverseTransformPoint(transform.position);
-            pos.x += width * -0.5f;
-            pos.y = Screen.height - pos.y - height * 2.2f;
-            Rect rect = new Rect(pos, new Vector2(width, height));
-            GUI.Label(rect, "No End Anchor!");
-        }
+        //if (_nextAnchor == null)
+        //{
+        //    Vector2 pos = Camera.main.transform.InverseTransformPoint(transform.position);
+        //    pos.x += width * -0.5f;
+        //    pos.y = Screen.height - pos.y - height * 2.2f;
+        //    Rect rect = new Rect(pos, new Vector2(width, height));
+        //    GUI.Label(rect, "No End Anchor!");
+        //}
     }
 
     #endregion
