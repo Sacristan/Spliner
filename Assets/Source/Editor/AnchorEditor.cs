@@ -57,7 +57,7 @@ public class AnchorEditor : Editor
     {
         Vector3 p0 = ShowPoint(0, spline);
 
-        Debug.Log(spline.ControlPointCount);
+        //Debug.Log(spline.ControlPointCount);
 
         for (int i = 1; i < spline.ControlPointCount; i += 3)
         {
