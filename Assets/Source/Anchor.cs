@@ -6,10 +6,10 @@ using System.Collections;
 public class Anchor : MonoBehaviour
 {
     [SerializeField]
-    List<BezierSpline> incomingSplines = new List<BezierSpline>();
+    List<BezierSpline> incomingSplines;
 
     [SerializeField]
-    List<BezierSpline> outgoingSplines = new List<BezierSpline>();
+    List<BezierSpline> outgoingSplines;
 
     [SerializeField]
     private Anchor _prevAnchor;
@@ -67,6 +67,11 @@ public class Anchor : MonoBehaviour
     void OnDisable()
     {
         CleanupSplines(true);
+    }
+
+    void Awake()
+    {
+        DecorateOutgoingSplines();
     }
 
     void OnEnable()

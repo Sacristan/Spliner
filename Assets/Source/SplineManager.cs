@@ -12,6 +12,7 @@ public class SplineManager : MonoBehaviour
 
     public List<BezierSpline> Splines { get { return splines; } }
 
+    [SerializeField]
     private Transform _splineContainer;
 
     private Transform SplineContainer
@@ -48,9 +49,10 @@ public class SplineManager : MonoBehaviour
         spline.Init(startAnchor, endAnchor);
 
         Singletone.splines.Add(spline);
-
+        spline.SplineManager = Singletone;
         spline.transform.SetParent(Singletone.SplineContainer.transform);
         spline.gameObject.name = "Spline_" + System.Guid.NewGuid();
+
         return spline;
     }
 
@@ -64,9 +66,10 @@ public class SplineManager : MonoBehaviour
             if (spline.EndAnchor == anchor)
             {
                 spline.MarkForDestruction();
-                Singletone.splines.Remove(spline);
+                Singletone.splines.RemoveAll(item=> item == spline);
             }
         }
+
     }
 
     public static void CleanupOutgoingSplinesForAnchor(Anchor anchor)
@@ -78,19 +81,15 @@ public class SplineManager : MonoBehaviour
             if (spline.StartAnchor == anchor)
             {
                 spline.MarkForDestruction();
-                Singletone.splines.Remove(spline);
+                Singletone.splines.RemoveAll(item => item == spline);
             }
         }
+
     }
 
     private static void CleanupNullSplinesInList()
     {
         Singletone.splines.RemoveAll(item => item == null);
-    }
-
-    private static void CleanupInactiveSplines()
-    {
-
     }
 
 }

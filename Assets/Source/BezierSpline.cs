@@ -13,13 +13,19 @@ public class BezierSpline : MonoBehaviour
 
     private bool loop;
 
+    [SerializeField]
     private Transform decoratorContainer;
 
+    [SerializeField]
     private Anchor _startAnchor;
+    [SerializeField]
     private Anchor _endAnchor;
 
-    SplineManager splineManager;
-    SplineDecorator splineDecorator;
+    [SerializeField]
+    private SplineManager splineManager;
+
+    [SerializeField]
+    private SplineDecorator splineDecorator;
 
     public bool IsDirty
     {
@@ -33,6 +39,12 @@ public class BezierSpline : MonoBehaviour
             if (splineDecorator == null) splineDecorator = GetComponent<SplineDecorator>();
             return splineDecorator;
         }
+    }
+
+    public SplineManager SplineManager
+    {
+        get { return splineManager;  }
+        set { splineManager = value; }
     }
 
     void Update()
@@ -124,15 +136,7 @@ public class BezierSpline : MonoBehaviour
     public void MarkForDestruction()
     {
         DestroyImmediate(gameObject);
-        //IEnumerator e = DestroyMe();
-        //while (e.MoveNext()) ;
     }
-
-    //private IEnumerator DestroyMe()
-    //{
-    //    yield return new WaitForSeconds(1f);
-    //    DestroyImmediate(gameObject);
-    //}
 
     public Vector3 GetControlPoint(int index)
     {

@@ -56,27 +56,34 @@ public class BezierSplineInspector : Editor {
 
 	private void OnSceneGUI () {
 		spline = target as BezierSpline;
-		handleTransform = spline.transform;
-		handleRotation = Tools.pivotRotation == PivotRotation.Local ?
-			handleTransform.rotation : Quaternion.identity;
+        DrawHandlesAndBezierSpline(spline);
+    }
+
+    private void DrawHandlesAndBezierSpline(BezierSpline spline)
+    {
+        handleTransform = spline.transform;
+        handleRotation = Tools.pivotRotation == PivotRotation.Local ?
+            handleTransform.rotation : Quaternion.identity;
 
         spline.SplineDecorator.GenerateKnobs();
 
         Vector3 p0 = ShowPoint(0);
-		for (int i = 1; i < spline.ControlPointCount; i += 3) {
-			Vector3 p1 = ShowPoint(i);
-			Vector3 p2 = ShowPoint(i + 1);
-			Vector3 p3 = ShowPoint(i + 2);
-			
-			Handles.color = Color.gray;
-			Handles.DrawLine(p0, p1);
-			Handles.DrawLine(p2, p3);
-			
-			Handles.DrawBezier(p0, p3, p1, p2, Color.white, null, 2f);
-			p0 = p3;
-		}
-		ShowDirections();
-	}
+
+        for (int i = 1; i < spline.ControlPointCount; i += 3)
+        {
+            Vector3 p1 = ShowPoint(i);
+            Vector3 p2 = ShowPoint(i + 1);
+            Vector3 p3 = ShowPoint(i + 2);
+
+            Handles.color = Color.blue;
+            Handles.DrawLine(p0, p1);
+            Handles.DrawLine(p2, p3);
+
+            Handles.DrawBezier(p0, p3, p1, p2, Color.yellow, null, 2f);
+            p0 = p3;
+        }
+        ShowDirections();
+    }
 
 	private void ShowDirections () {
 		Handles.color = Color.green;
