@@ -35,6 +35,14 @@ public class Anchor : MonoBehaviour
         }
     }
 
+    public BezierSpline[] AllSplines
+    {
+        get
+        {
+            return OutgoingSplines;
+        }
+    }
+
     public Anchor NextAnchor
     {
         get { return _nextAnchor; }
