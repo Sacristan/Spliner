@@ -32,6 +32,21 @@ public class BezierSpline : MonoBehaviour
         get { return StartAnchor == null || EndAnchor == null; }
     }
 
+    public Anchor IncomingAnchor
+    {
+        get { return null; }
+    }
+
+    public Anchor OutgoingAnchor
+    {
+        get { return null; }
+    }
+
+    public Knob[] Knobs
+    {
+        get { return new Knob[0]; }
+    }
+
     public SplineDecorator SplineDecorator
     {
         get
