@@ -12,6 +12,9 @@ public class Anchor : MonoBehaviour
     List<BezierSpline> outgoingSplines = new List<BezierSpline>();
 
     [SerializeField]
+    private Anchor _prevAnchor;
+
+    [SerializeField]
     private Anchor _nextAnchor;
 
     #region Properties
@@ -34,9 +37,16 @@ public class Anchor : MonoBehaviour
 
     public Anchor NextAnchor
     {
-        get
+        get { return _nextAnchor; }
+        set { _nextAnchor = value; }
+    }
+
+    public Anchor PrevAnchor
+    {
+        get { return _prevAnchor; }
+        set
         {
-            return _nextAnchor;
+            _prevAnchor = value;
         }
     }
 
@@ -54,8 +64,20 @@ public class Anchor : MonoBehaviour
         CleanupSplines(true);
     }
 
+    void OnDisable()
+    {
+        CleanupSplines(true);
+    }
+
     void OnEnable()
     {
+        //TODO: This currently is not Generating Previous splines
+        if (PrevAnchor != null)
+        {
+            PrevAnchor.AddSplinesIfRequired();
+            PrevAnchor.DecorateOutgoingSplines();
+        }
+
         CleanupAndAddSplinesIfRequired();
     }
 
@@ -65,7 +87,7 @@ public class Anchor : MonoBehaviour
         int height = 25;
         int width = 100;
 
-        if (NextAnchor == null)
+        if (_nextAnchor == null)
         {
             Vector2 pos = Camera.main.transform.InverseTransformPoint(transform.position);
             pos.x += width * -0.5f;
@@ -88,20 +110,32 @@ public class Anchor : MonoBehaviour
         incomingSplines.Add(spline);
     }
 
+    /// <summary>
+    /// Cleans up splines and adds new ones (if required) on request
+    /// </summary>
     public void CleanupAndAddSplinesIfRequired()
     {
         CleanupSplines();
         AddSplinesIfRequired();
     }
 
+
+    /// <summary>
+    /// Checks if next anchor present and if outgoint splines already arent over limit. If ok then generates a new outgoing spline
+    /// </summary>
     public void AddSplinesIfRequired()
     {
         RemoveRenundantSplinesFromArrays();
-        if (_nextAnchor != null && outgoingSplines.Count < 1)
+        if (_nextAnchor != null)
         {
-            BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
-            outgoingSplines.Add(spline);
-            _nextAnchor.AddIncomingSpline(spline);
+            if (outgoingSplines.Count < 1)
+            {
+                _nextAnchor.PrevAnchor = this;
+
+                BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
+                outgoingSplines.Add(spline);
+                _nextAnchor.AddIncomingSpline(spline);
+            }
         }
     }
 
