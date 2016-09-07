@@ -42,12 +42,43 @@ public class SplineManager : MonoBehaviour
     {
         GameObject splineGO = Instantiate(Singletone.splineTemplate.gameObject) as GameObject;
         BezierSpline spline = splineGO.GetComponent<BezierSpline>();
-        Singletone.splines.Add(spline);
 
         spline.Init(startAnchor, endAnchor);
+
+        Singletone.splines.Add(spline);
+
         spline.transform.SetParent(Singletone.SplineContainer.transform);
         spline.gameObject.name = "Spline_" + System.Guid.NewGuid();
         return spline;
+    }
+
+
+    public static void CleanupIncomingSplinesForAnchor(Anchor anchor)
+    {
+        Singletone.splines.RemoveAll(item => item == null);
+
+        foreach (BezierSpline spline in Singletone.splines.ToArray())
+        {
+            if (spline.EndAnchor == anchor)
+            {
+                spline.MarkForDestruction();
+                Singletone.splines.Remove(spline);
+            }
+        }
+    }
+
+    public static void CleanupOutgoingSplinesForAnchor(Anchor anchor)
+    {
+        Singletone.splines.RemoveAll(item => item == null);
+
+        foreach (BezierSpline spline in Singletone.splines.ToArray())
+        {
+            if (spline.StartAnchor == anchor)
+            {
+                spline.MarkForDestruction();
+                Singletone.splines.Remove(spline);
+            }
+        }
     }
 
 }

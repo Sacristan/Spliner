@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 
 [CustomEditor(typeof(Anchor))]
 public class AnchorEditor : Editor
@@ -29,23 +28,21 @@ public class AnchorEditor : Editor
                 Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
             }
 
-            anchor.HandleSplines();
+            anchor.DecorateOutgoingSplines();
         }
 
     }
 
     public override void OnInspectorGUI()
     {
-        targetAnchor.HandleSplines();
-
-
+        targetAnchor.DecorateOutgoingSplines();
         EditorGUI.BeginChangeCheck();
         EditorGUILayout.PropertyField(NextAnchorProperty);
 
         if (EditorGUI.EndChangeCheck())
         {
             SerializedTargetAnchor.ApplyModifiedProperties();
-            targetAnchor.HandleNextAnchorChange();
+            targetAnchor.AddSplinesIfRequired();
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 [ExecuteInEditMode]
 public class Anchor : MonoBehaviour
@@ -12,6 +13,8 @@ public class Anchor : MonoBehaviour
 
     [SerializeField]
     private Anchor _nextAnchor;
+
+    #region Properties
 
     public BezierSpline[] IncomingSplines
     {
@@ -37,18 +40,14 @@ public class Anchor : MonoBehaviour
         }
     }
 
-    public void HandleNextAnchorChange()
+    #endregion
+
+    #region MonoBehaviour methods
+
+    void OnValidate()
     {
-        CleanupSplines();
-
-        if (_nextAnchor != null)
-        {
-            BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
-            outgoingSplines.Add(spline);
-            _nextAnchor.AddIncomingSpline(spline);
-        }
+        //AddSplinesIfRequired();
     }
-
 
     void OnDestroy()
     {
@@ -71,11 +70,35 @@ public class Anchor : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Spline methods
+
+    /// <summary>
+    /// Addds incoming splines
+    /// </summary>
+    /// <param name="spline"></param>
     public void AddIncomingSpline(BezierSpline spline)
     {
         incomingSplines.Add(spline);
     }
 
+    public void AddSplinesIfRequired()
+    {
+        CleanupSplines();
+
+        if (_nextAnchor != null)
+        {
+            BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
+            outgoingSplines.Add(spline);
+            _nextAnchor.AddIncomingSpline(spline);
+        }
+    }
+
+    /// <summary>
+    /// Cleanup outgoing and incoming(optional) splines
+    /// </summary>
+    /// <param name="cleanIncoming"> Clears also incoming splines </param>
     public void CleanupSplines(bool cleanIncoming=false)
     {
         Debug.Log("CleanupSplines called");
@@ -84,19 +107,24 @@ public class Anchor : MonoBehaviour
 
         RemoveRenundantSplinesFromArrays();
 
+        SplineManager.CleanupOutgoingSplinesForAnchor(this);
         foreach (BezierSpline spline in OutgoingSplines)
-            DestroyImmediate(spline.gameObject);
+            outgoingSplines.Remove(spline);
 
         if (cleanIncoming)
         {
+            SplineManager.CleanupIncomingSplinesForAnchor(this);
             foreach (BezierSpline spline in IncomingSplines)
-                DestroyImmediate(spline.gameObject);
+                incomingSplines.Remove(spline);
         }
 
         RemoveRenundantSplinesFromArrays();
     }
 
-    public void HandleSplines()
+    /// <summary>
+    /// Decorates Outgoing Splines with Knobs
+    /// </summary>
+    public void DecorateOutgoingSplines()
     {
         foreach (BezierSpline spline in this.OutgoingSplines)
         {
@@ -105,10 +133,15 @@ public class Anchor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Removes null entries in Spline Lists
+    /// </summary>
     private void RemoveRenundantSplinesFromArrays()
     {
         outgoingSplines.RemoveAll(item => item == null);
         incomingSplines.RemoveAll(item => item == null);
     }
+
+    #endregion
 
 }
