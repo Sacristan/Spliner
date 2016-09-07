@@ -19,6 +19,23 @@ public class Anchor : MonoBehaviour
 
     #region Properties
 
+
+    public Anchor[] OutgoingAnchors
+    {
+        get
+        {
+            return new Anchor[0];
+        }
+    }
+
+    public Anchor[] IncomingAnchors
+    {
+        get
+        {
+            return new Anchor[0];
+        }
+    }
+
     public BezierSpline[] IncomingSplines
     {
         get
@@ -40,6 +57,23 @@ public class Anchor : MonoBehaviour
         get
         {
             return OutgoingSplines;
+        }
+    }
+
+
+    public Knob[] OutgoingKnobs
+    {
+        get
+        {
+            return new Knob[0];
+        }
+    }
+
+    public Knob[] IncomingKnobs
+    {
+        get
+        {
+            return new Knob[0];
         }
     }
 
@@ -156,7 +190,7 @@ public class Anchor : MonoBehaviour
     /// Cleanup outgoing and incoming(optional) splines
     /// </summary>
     /// <param name="cleanIncoming"> Clears also incoming splines </param>
-    public void CleanupSplines(bool cleanIncoming=false)
+    public void CleanupSplines(bool cleanIncoming = false)
     {
         Debug.Log("CleanupSplines called");
 
