@@ -7,17 +7,22 @@ public class Anchor : MonoBehaviour
 {
 
     [SerializeField]
-    private Anchor[] _outgoingAnchors;
+    private List<Anchor> _outgoingAnchors;
 
     [SerializeField]
-    private Anchor[] _incomingAnchors;
+    private List<Anchor> _incomingAnchors;
 
     #region Properties
     public Anchor[] OutgoingAnchors
     {
         get
         {
-            return _outgoingAnchors;
+            return _outgoingAnchors.ToArray();
+        }
+
+        set
+        {
+            _outgoingAnchors = new List<Anchor>(value);
         }
     }
 
@@ -25,7 +30,12 @@ public class Anchor : MonoBehaviour
     {
         get
         {
-            return _incomingAnchors;
+            return _incomingAnchors.ToArray();
+        }
+
+        set
+        {
+            _incomingAnchors = new List<Anchor>(value);
         }
     }
 
@@ -69,24 +79,19 @@ public class Anchor : MonoBehaviour
 
     #region MonoBehaviour methods
 
-    void OnValidate()
-    {
-        AddSplinesIfRequired();
-    }
-
     void OnDestroy()
     {
-        CleanupSplines(true);
+        //CleanupSplines(true);
     }
 
     void OnDisable()
     {
-        CleanupSplines(true);
+        //CleanupSplines(true);
     }
 
     void Awake()
     {
-        DecorateOutgoingSplines();
+        //DecorateOutgoingSplines();
     }
 
     void OnEnable()
@@ -98,26 +103,56 @@ public class Anchor : MonoBehaviour
         //    PrevAnchor.DecorateOutgoingSplines();
         //}
 
-        CleanupAndAddSplinesIfRequired();
+        //CleanupAndAddSplinesIfRequired();
     }
 
-    void OnGUI()
+
+    void Update()
     {
-        //if (Application.isPlaying) return;
-        //int height = 25;
-        //int width = 100;
-
-        //if (_nextAnchor == null)
+        //foreach (Anchor anchor in _incomingAnchors)
         //{
-        //    Vector2 pos = Camera.main.transform.InverseTransformPoint(transform.position);
-        //    pos.x += width * -0.5f;
-        //    pos.y = Screen.height - pos.y - height * 2.2f;
-        //    Rect rect = new Rect(pos, new Vector2(width, height));
-        //    GUI.Label(rect, "No End Anchor!");
+        //    Debug.DrawLine(this.transform.position, anchor.transform.position, Color.red);
         //}
+
+        foreach (Anchor anchor in _outgoingAnchors)
+        {
+            Debug.DrawLine(this.transform.position, anchor.transform.position, Color.cyan);
+        }
     }
+
 
     #endregion
+
+    public void SyncAnchors()
+    {
+        Debug.Log("Syncing Anchors...");
+
+        foreach(Anchor anchor in _incomingAnchors)
+        {
+            if (anchor !=null) anchor.SyncOutgoingAnchor(this);
+        }
+
+        foreach (Anchor anchor in _outgoingAnchors)
+        {
+            if (anchor != null) anchor.SyncIncomingAnchor(this);
+        }
+    }
+
+    public void SyncIncomingAnchor(Anchor anchor)
+    {
+        if (!this._incomingAnchors.Contains(anchor) && this != anchor)
+        {
+            this._incomingAnchors.Add(anchor);
+        }
+    }
+
+    public void SyncOutgoingAnchor(Anchor anchor)
+    {
+        if (!this._outgoingAnchors.Contains(anchor) && this != anchor)
+        {
+            this._outgoingAnchors.Add(anchor);
+        }
+    }
 
     #region Spline methods
 
