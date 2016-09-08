@@ -12,7 +12,6 @@ public class AnchorEditor : Editor
     {
         targetAnchor = (Anchor)target;
         SerializedTargetAnchor = new SerializedObject(targetAnchor);
-        //NextAnchorProperty = SerializedTargetAnchor.FindProperty("_nextAnchor");
     }
 
     private void OnSceneGUI()
@@ -23,8 +22,15 @@ public class AnchorEditor : Editor
         {
             Anchor anchor = anchors[i];
 
-            foreach(BezierSpline spline in anchor.OutgoingSplines)
+            foreach(BezierSpline spline in anchor.OutgoingSplines.ToArray())
             {
+                if(spline == null)
+                {
+                    anchor.SyncAnchors();
+                    anchor.IncomingAnchors.ForEach(item => item.SyncAnchors());
+                    continue;
+                }
+
                 spline.SetControlPoints();
                 DrawHandlesAndBezierSpline(spline);
             }

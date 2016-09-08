@@ -12,6 +12,8 @@ public class Anchor : MonoBehaviour
     [SerializeField]
     private List<BezierSpline> _incomingSplines = new List<BezierSpline>();
 
+    private List<BezierSpline> _allSplines = new List<BezierSpline>();
+
     [Header("Configure Anchor relations here")]
 
     [SerializeField]
@@ -61,6 +63,22 @@ public class Anchor : MonoBehaviour
         get
         {
             return _outgoingSplines;
+        }
+    }
+
+    public List<BezierSpline> AllSplines
+    {
+        get
+        {
+            if (_allSplines == null)
+            {
+                List<BezierSpline> a = IncomingSplines;
+                List<BezierSpline> b = OutgoingSplines;
+                a.AddRange(b);
+                _allSplines = a;
+            }
+
+            return _allSplines;
         }
     }
 
@@ -259,6 +277,7 @@ public class Anchor : MonoBehaviour
     {
         _outgoingSplines.RemoveAll(item => item == null);
         _incomingSplines.RemoveAll(item => item == null);
+        _allSplines = null;
     }
 
     #endregion
