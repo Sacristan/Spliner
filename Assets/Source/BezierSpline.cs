@@ -43,15 +43,6 @@ public class BezierSpline : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        if (Application.isPlaying || IsDirty) return;
-        Debug.DrawLine(StartPoint, EndPoint, Color.yellow);
-
-        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
-        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
-    }
-
     public Anchor StartAnchor
     {
         get { return _startAnchor; }
@@ -140,6 +131,14 @@ public class BezierSpline : MonoBehaviour
     public void Decorate()
     {
         SplineDecorator.GenerateKnobs();
+    }
+
+    public void SetControlPoints() {
+        if (Application.isPlaying || IsDirty) return;
+        Debug.DrawLine(StartPoint, EndPoint, Color.yellow);
+
+        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
+        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
     }
 
     public void MarkForDestruction()

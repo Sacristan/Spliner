@@ -23,15 +23,17 @@ public class AnchorEditor : Editor
         {
             Anchor anchor = anchors[i];
 
-            //if (anchor.NextAnchor != null)
-            //{
-            //    Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
-            //}
-
             foreach(BezierSpline spline in anchor.OutgoingSplines)
             {
+                spline.SetControlPoints();
                 DrawHandlesAndBezierSpline(spline);
             }
+
+            //    foreach (Anchor anchor in _outgoingAnchors)
+            //    {
+            //        if(anchor!=null) Debug.DrawLine(this.transform.position, anchor.transform.position, Color.cyan);
+            //    }
+
         }
 
     }

@@ -86,41 +86,14 @@ public class Anchor : MonoBehaviour
 
     #region MonoBehaviour methods
 
-    void OnDestroy()
-    {
-        //CleanupSplines(true);
-    }
 
-    void OnDisable()
-    {
-        //CleanupSplines(true);
-    }
-
-    void Awake()
-    {
-        //DecorateOutgoingSplines();
-    }
-
-    void OnEnable()
-    {
-        //TODO: This currently is not Generating Previous splines
-        //if (PrevAnchor != null)
-        //{
-        //    PrevAnchor.AddSplinesIfRequired();
-        //    PrevAnchor.DecorateOutgoingSplines();
-        //}
-
-        //CleanupAndAddSplinesIfRequired();
-    }
-
-
-    void Update()
-    {
-        foreach (Anchor anchor in _outgoingAnchors)
-        {
-            if(anchor!=null) Debug.DrawLine(this.transform.position, anchor.transform.position, Color.cyan);
-        }
-    }
+    //void Update()
+    //{
+    //    foreach (Anchor anchor in _outgoingAnchors)
+    //    {
+    //        if(anchor!=null) Debug.DrawLine(this.transform.position, anchor.transform.position, Color.cyan);
+    //    }
+    //}
 
 
     #endregion
