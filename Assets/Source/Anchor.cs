@@ -5,18 +5,20 @@ using System.Collections;
 [ExecuteInEditMode]
 public class Anchor : MonoBehaviour
 {
+    [Header("Do not Edit")]
     [SerializeField]
-    private List<Anchor> _outgoingAnchors;
+    private List<BezierSpline> _outgoingSplines = new List<BezierSpline>();
 
     [SerializeField]
-    private List<Anchor> _incomingAnchors;
+    private List<BezierSpline> _incomingSplines = new List<BezierSpline>();
+
+    [Header("Configure Anchor relations here")]
 
     [SerializeField]
-    private List<BezierSpline> _outgoingSplines;
+    private List<Anchor> _outgoingAnchors = new List<Anchor>();
 
     [SerializeField]
-    private List<BezierSpline> _incomingSplines;
-
+    private List<Anchor> _incomingAnchors = new List<Anchor>();
 
     #region Properties
     public List<Anchor> OutgoingAnchors
@@ -126,7 +128,7 @@ public class Anchor : MonoBehaviour
     #region Anchor Sync
     public void SyncAnchors()
     {
-        Debug.Log("Syncing Anchors...");
+        //Debug.Log("Syncing Anchors...");
 
         foreach (Anchor anchor in _incomingAnchors)
         {
@@ -152,7 +154,7 @@ public class Anchor : MonoBehaviour
     {
         if (this == anchor)
         {
-            this._incomingAnchors.Remove(anchor);
+            this._incomingAnchors.RemoveAll(item => item == anchor);
             AddOutgoingSpline(anchor);
         }
         else
@@ -169,7 +171,7 @@ public class Anchor : MonoBehaviour
     {
         if (this == anchor)
         {
-            this._outgoingAnchors.Remove(anchor);
+            this._outgoingAnchors.RemoveAll(item => item == anchor);
         }
         else
         {
@@ -182,7 +184,7 @@ public class Anchor : MonoBehaviour
 
     private void SyncAndCleanupAnchors()
     {
-        Debug.Log("SyncAndCleanupAnchors");
+        //Debug.Log("SyncAndCleanupAnchors");
         Anchor[] anchors = FindObjectsOfType<Anchor>();
 
         foreach (Anchor anchor in anchors)
@@ -191,12 +193,28 @@ public class Anchor : MonoBehaviour
 
             if (anchor._incomingAnchors.Contains(this) && !this._outgoingAnchors.Contains(anchor))
             {
-                anchor._incomingAnchors.RemoveAll(item => item == this);
+                //anchor._incomingAnchors.RemoveAll(item => item == this);
+
+                foreach (Anchor incomingAnchor in anchor._incomingAnchors.ToArray())
+                {
+                    if (incomingAnchor == this)
+                    {
+                        anchor.CleanupIncomingSplinesWithAnchor(this);
+                        anchor._incomingAnchors.RemoveAll(item => item == this);
+                    }
+                }
             }
 
             if (anchor._outgoingAnchors.Contains(this) && !this._incomingAnchors.Contains(anchor))
             {
-                anchor._outgoingAnchors.RemoveAll(item => item == this);
+                foreach (Anchor outgoingAnchor in anchor._outgoingAnchors.ToArray())
+                {
+                    if (outgoingAnchor == this)
+                    {
+                        anchor.CleanupOutgoingSplinesWithAnchor(this);
+                        anchor._outgoingAnchors.RemoveAll(item => item == this);
+                    }
+                }
             }
         }
 
@@ -210,6 +228,7 @@ public class Anchor : MonoBehaviour
         BezierSpline spline = BezierSpline.Create(anchor, this);
         _incomingSplines.Add(spline);
         anchor._outgoingSplines.Add(spline);
+        RemoveRenundantSplinesFromArrays();
     }
 
     private void AddOutgoingSpline(Anchor anchor)
@@ -217,6 +236,41 @@ public class Anchor : MonoBehaviour
         BezierSpline spline = BezierSpline.Create(this, anchor);
         _outgoingSplines.Add(spline);
         anchor._incomingSplines.Add(spline);
+        RemoveRenundantSplinesFromArrays();
+    }
+
+    public void CleanupIncomingSplinesWithAnchor(Anchor anchor)
+    {
+        //Debug.Log("CleanupIncomingSplinesWithAnchor");
+
+        foreach (BezierSpline spline in _incomingSplines.ToArray())
+        {
+            if (spline.StartAnchor == anchor)
+            {
+                _incomingSplines.RemoveAll(item => item == spline);
+                anchor._outgoingSplines.RemoveAll(item => item == spline);
+                spline.MarkForDestruction();
+            }
+        }
+
+        RemoveRenundantSplinesFromArrays();
+    }
+
+    public void CleanupOutgoingSplinesWithAnchor(Anchor anchor)
+    {
+        //Debug.Log("CleanupOutgoingSplinesWithAnchor");
+
+        foreach (BezierSpline spline in _outgoingSplines.ToArray())
+        {
+            if (spline.EndAnchor == anchor)
+            {
+                _outgoingSplines.RemoveAll(item => item == spline);
+                anchor._incomingSplines.RemoveAll(item => item == spline);
+                spline.MarkForDestruction();
+            }
+        }
+
+        RemoveRenundantSplinesFromArrays();
     }
 
     /// <summary>
@@ -229,6 +283,15 @@ public class Anchor : MonoBehaviour
             if (spline == null) continue;
             spline.Decorate();
         }
+    }
+
+    /// <summary>
+    /// Removes null entries in Spline Lists
+    /// </summary>
+    private void RemoveRenundantSplinesFromArrays()
+    {
+        _outgoingSplines.RemoveAll(item => item == null);
+        _incomingSplines.RemoveAll(item => item == null);
     }
 
     #endregion
