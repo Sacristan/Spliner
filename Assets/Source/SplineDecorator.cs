@@ -6,7 +6,7 @@ using System.Collections;
 public class SplineDecorator : MonoBehaviour
 {
     private BezierSpline spline;
-    public Transform itemToSpawn;
+    public Transform knobTemplate;
 
     private const float DISTANCE_PER_KNOB = 75f;
     private const float OFFET_FROM_BORDERS = 50f;
@@ -53,26 +53,6 @@ public class SplineDecorator : MonoBehaviour
         GenerateKnobs();
     }
 
-
-    //void HandleLengthChangeIfRequired()
-    //{
-    //    Debug.Log("HandleLengthChangeIfRequired");
-    //    bool lengthChanged = lastLength != Spline.Length;
-
-    //    if (lengthChanged)
-    //    {
-    //        inChange = true;
-    //        lastLength = Spline.Length;
-    //    }
-    //    else
-    //    {
-    //        if (inChange)
-    //            Generate();
-
-    //        inChange = false;
-    //    }
-    //}
-
     public void GenerateKnobs()
     {
         if (Application.isPlaying) return;
@@ -86,7 +66,7 @@ public class SplineDecorator : MonoBehaviour
             float stepNormalized = (i * stepSize);
             //if (stepNormalized < offSetNormalized || stepNormalized >= (1 - offSetNormalized)) continue;
 
-            Transform itemSpawned = Instantiate(itemToSpawn) as Transform;
+            Transform itemSpawned = Instantiate(knobTemplate) as Transform;
 
             Vector3 position = spline.GetPoint(stepNormalized);
 

@@ -6,13 +6,13 @@ public class AnchorEditor : Editor
 {
     Anchor targetAnchor;
     SerializedObject SerializedTargetAnchor;
-    SerializedProperty NextAnchorProperty;
+    //SerializedProperty NextAnchorProperty;
 
     void OnEnable()
     {
         targetAnchor = (Anchor)target;
         SerializedTargetAnchor = new SerializedObject(targetAnchor);
-        NextAnchorProperty = SerializedTargetAnchor.FindProperty("_nextAnchor");
+        //NextAnchorProperty = SerializedTargetAnchor.FindProperty("_nextAnchor");
     }
 
     private void OnSceneGUI()
@@ -23,13 +23,10 @@ public class AnchorEditor : Editor
         {
             Anchor anchor = anchors[i];
 
-            if (anchor.NextAnchor != null)
-            {
-                Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
-            }
-
-            anchor.AddSplinesIfRequired();
-            anchor.DecorateOutgoingSplines();
+            //if (anchor.NextAnchor != null)
+            //{
+            //    Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
+            //}
 
             foreach(BezierSpline spline in anchor.OutgoingSplines)
             {
@@ -41,23 +38,20 @@ public class AnchorEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        targetAnchor.DecorateOutgoingSplines();
-        EditorGUI.BeginChangeCheck();
-        EditorGUILayout.PropertyField(NextAnchorProperty);
+        DrawDefaultInspector();
 
-        if (EditorGUI.EndChangeCheck())
+        if (GUI.changed)
         {
-            SerializedTargetAnchor.ApplyModifiedProperties();
-            targetAnchor.CleanupAndAddSplinesIfRequired();
+            //Debug.Log("GUI changed");
+            targetAnchor.SyncAnchors();
         }
-
     }
 
     private void DrawHandlesAndBezierSpline(BezierSpline spline)
     {
         Vector3 p0 = ShowPoint(0, spline);
 
-        Debug.Log(spline.ControlPointCount);
+        //Debug.Log(spline.ControlPointCount);
 
         for (int i = 1; i < spline.ControlPointCount; i += 3)
         {
@@ -73,11 +67,11 @@ public class AnchorEditor : Editor
 
             Handles.color = prevColor;
 
-            Handles.DrawBezier(p0, p3, p1, p2, Color.yellow, null, 2f);
+            Handles.DrawBezier(p0, p3, p1, p2, Color.green, null, 2f);
 
             p0 = p3;
         }
-        spline.SplineDecorator.GenerateKnobs();
+        spline.Decorate();
     }
 
     private Vector3 ShowPoint(int index, BezierSpline spline)
