@@ -5,26 +5,19 @@ using System.Collections;
 [ExecuteInEditMode]
 public class Anchor : MonoBehaviour
 {
-    [SerializeField]
-    List<BezierSpline> incomingSplines;
 
     [SerializeField]
-    List<BezierSpline> outgoingSplines;
+    private Anchor[] _outgoingAnchors;
 
     [SerializeField]
-    private Anchor _prevAnchor;
-
-    [SerializeField]
-    private Anchor _nextAnchor;
+    private Anchor[] _incomingAnchors;
 
     #region Properties
-
-
     public Anchor[] OutgoingAnchors
     {
         get
         {
-            return new Anchor[0];
+            return _outgoingAnchors;
         }
     }
 
@@ -32,35 +25,29 @@ public class Anchor : MonoBehaviour
     {
         get
         {
-            return new Anchor[0];
+            return _incomingAnchors;
         }
     }
 
+    //TODO: Take from incoming anchors
     public BezierSpline[] IncomingSplines
     {
         get
         {
-            return incomingSplines.ToArray();
+            return new BezierSpline[0];
         }
     }
 
+    //TODO: Take from outgoing anchors
     public BezierSpline[] OutgoingSplines
     {
         get
         {
-            return outgoingSplines.ToArray();
+            return new BezierSpline[0];
         }
     }
 
-    public BezierSpline[] AllSplines
-    {
-        get
-        {
-            return OutgoingSplines;
-        }
-    }
-
-
+    //TODO: Take from incoming splines
     public Knob[] OutgoingKnobs
     {
         get
@@ -69,26 +56,12 @@ public class Anchor : MonoBehaviour
         }
     }
 
+    //TODO: Take from outgoing splines
     public Knob[] IncomingKnobs
     {
         get
         {
             return new Knob[0];
-        }
-    }
-
-    public Anchor NextAnchor
-    {
-        get { return _nextAnchor; }
-        set { _nextAnchor = value; }
-    }
-
-    public Anchor PrevAnchor
-    {
-        get { return _prevAnchor; }
-        set
-        {
-            _prevAnchor = value;
         }
     }
 
@@ -119,11 +92,11 @@ public class Anchor : MonoBehaviour
     void OnEnable()
     {
         //TODO: This currently is not Generating Previous splines
-        if (PrevAnchor != null)
-        {
-            PrevAnchor.AddSplinesIfRequired();
-            PrevAnchor.DecorateOutgoingSplines();
-        }
+        //if (PrevAnchor != null)
+        //{
+        //    PrevAnchor.AddSplinesIfRequired();
+        //    PrevAnchor.DecorateOutgoingSplines();
+        //}
 
         CleanupAndAddSplinesIfRequired();
     }
@@ -154,7 +127,7 @@ public class Anchor : MonoBehaviour
     /// <param name="spline"></param>
     public void AddIncomingSpline(BezierSpline spline)
     {
-        incomingSplines.Add(spline);
+        //incomingSplines.Add(spline);
     }
 
     /// <summary>
@@ -172,18 +145,20 @@ public class Anchor : MonoBehaviour
     /// </summary>
     public void AddSplinesIfRequired()
     {
-        RemoveRenundantSplinesFromArrays();
-        if (_nextAnchor != null)
-        {
-            if (outgoingSplines.Count < 1)
-            {
-                _nextAnchor.PrevAnchor = this;
+        // TODO: FIX
 
-                BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
-                outgoingSplines.Add(spline);
-                _nextAnchor.AddIncomingSpline(spline);
-            }
-        }
+        //RemoveRenundantSplinesFromArrays();
+        //if (_nextAnchor != null)
+        //{
+        //    if (outgoingSplines.Count < 1)
+        //    {
+        //        //_nextAnchor.PrevAnchor = this;
+
+        //        BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
+        //        outgoingSplines.Add(spline);
+        //        _nextAnchor.AddIncomingSpline(spline);
+        //    }
+        //}
     }
 
     /// <summary>
@@ -192,24 +167,24 @@ public class Anchor : MonoBehaviour
     /// <param name="cleanIncoming"> Clears also incoming splines </param>
     public void CleanupSplines(bool cleanIncoming = false)
     {
-        Debug.Log("CleanupSplines called");
+        //Debug.Log("CleanupSplines called");
 
-        if (Application.isPlaying) return;
+        //if (Application.isPlaying) return;
 
-        RemoveRenundantSplinesFromArrays();
+        //RemoveRenundantSplinesFromArrays();
 
-        SplineManager.CleanupOutgoingSplinesForAnchor(this);
-        foreach (BezierSpline spline in OutgoingSplines)
-            outgoingSplines.Remove(spline);
+        //SplineManager.CleanupOutgoingSplinesForAnchor(this);
+        //foreach (BezierSpline spline in OutgoingSplines)
+        //    outgoingSplines.Remove(spline);
 
-        if (cleanIncoming)
-        {
-            SplineManager.CleanupIncomingSplinesForAnchor(this);
-            foreach (BezierSpline spline in IncomingSplines)
-                incomingSplines.Remove(spline);
-        }
+        //if (cleanIncoming)
+        //{
+        //    SplineManager.CleanupIncomingSplinesForAnchor(this);
+        //    foreach (BezierSpline spline in IncomingSplines)
+        //        incomingSplines.Remove(spline);
+        //}
 
-        RemoveRenundantSplinesFromArrays();
+        //RemoveRenundantSplinesFromArrays();
     }
 
     /// <summary>
@@ -229,8 +204,8 @@ public class Anchor : MonoBehaviour
     /// </summary>
     private void RemoveRenundantSplinesFromArrays()
     {
-        outgoingSplines.RemoveAll(item => item == null);
-        incomingSplines.RemoveAll(item => item == null);
+        //outgoingSplines.RemoveAll(item => item == null);
+        //incomingSplines.RemoveAll(item => item == null);
     }
 
     #endregion
