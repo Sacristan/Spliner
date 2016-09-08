@@ -22,9 +22,6 @@ public class BezierSpline : MonoBehaviour
     private Anchor _endAnchor;
 
     [SerializeField]
-    private SplineManager splineManager;
-
-    [SerializeField]
     private SplineDecorator splineDecorator;
 
     public bool IsDirty
@@ -54,12 +51,6 @@ public class BezierSpline : MonoBehaviour
             if (splineDecorator == null) splineDecorator = GetComponent<SplineDecorator>();
             return splineDecorator;
         }
-    }
-
-    public SplineManager SplineManager
-    {
-        get { return splineManager;  }
-        set { splineManager = value; }
     }
 
     void Update()
@@ -142,12 +133,20 @@ public class BezierSpline : MonoBehaviour
         }
     }
 
-    public void Init(Anchor startAnchor, Anchor endAnchor)
+    public static BezierSpline Create(Anchor startAnchor, Anchor endAnchor)
     {
-        _startAnchor = startAnchor;
-        _endAnchor = endAnchor;
+        GameObject splineGO = Instantiate(AnchorManager.SplineTemplate.gameObject) as GameObject;
+        BezierSpline spline = splineGO.GetComponent<BezierSpline>();
+
+        spline._startAnchor = startAnchor;
+        spline._endAnchor = endAnchor;
+
+        spline.transform.SetParent(AnchorManager.SplineContainer.transform);
+        spline.gameObject.name = "Spline_" + System.Guid.NewGuid();
+
+        return spline;
     }
-    
+
     public void MarkForDestruction()
     {
         DestroyImmediate(gameObject);

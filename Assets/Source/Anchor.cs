@@ -146,6 +146,7 @@ public class Anchor : MonoBehaviour
         }
 
         SyncAndCleanupAnchors();
+        CleanupAndAddSplinesIfRequired();
     }
 
     public void SyncIncomingAnchor(Anchor anchor)
@@ -195,15 +196,6 @@ public class Anchor : MonoBehaviour
     #region Spline methods
 
     /// <summary>
-    /// Addds incoming splines
-    /// </summary>
-    /// <param name="spline"></param>
-    public void AddIncomingSpline(BezierSpline spline)
-    {
-        //incomingSplines.Add(spline);
-    }
-
-    /// <summary>
     /// Cleans up splines and adds new ones (if required) on request
     /// </summary>
     public void CleanupAndAddSplinesIfRequired()
@@ -212,26 +204,16 @@ public class Anchor : MonoBehaviour
         AddSplinesIfRequired();
     }
 
-
     /// <summary>
     /// Checks if next anchor present and if outgoint splines already arent over limit. If ok then generates a new outgoing spline
     /// </summary>
     public void AddSplinesIfRequired()
     {
-        // TODO: FIX
+        foreach (Anchor anchor in OutgoingAnchors)
+        {
+            //BezierSpline spline = BezierSpline.Create(this, anchor);
 
-        //RemoveRenundantSplinesFromArrays();
-        //if (_nextAnchor != null)
-        //{
-        //    if (outgoingSplines.Count < 1)
-        //    {
-        //        //_nextAnchor.PrevAnchor = this;
-
-        //        BezierSpline spline = SplineManager.AddSpline(this, _nextAnchor);
-        //        outgoingSplines.Add(spline);
-        //        _nextAnchor.AddIncomingSpline(spline);
-        //    }
-        //}
+        }
     }
 
     /// <summary>
@@ -240,24 +222,7 @@ public class Anchor : MonoBehaviour
     /// <param name="cleanIncoming"> Clears also incoming splines </param>
     public void CleanupSplines(bool cleanIncoming = false)
     {
-        //Debug.Log("CleanupSplines called");
-
-        //if (Application.isPlaying) return;
-
-        //RemoveRenundantSplinesFromArrays();
-
-        //SplineManager.CleanupOutgoingSplinesForAnchor(this);
-        //foreach (BezierSpline spline in OutgoingSplines)
-        //    outgoingSplines.Remove(spline);
-
-        //if (cleanIncoming)
-        //{
-        //    SplineManager.CleanupIncomingSplinesForAnchor(this);
-        //    foreach (BezierSpline spline in IncomingSplines)
-        //        incomingSplines.Remove(spline);
-        //}
-
-        //RemoveRenundantSplinesFromArrays();
+        
     }
 
     /// <summary>
@@ -265,22 +230,12 @@ public class Anchor : MonoBehaviour
     /// </summary>
     public void DecorateOutgoingSplines()
     {
-        foreach (BezierSpline spline in this.OutgoingSplines)
+        foreach (BezierSpline spline in OutgoingSplines)
         {
             if (spline == null) continue;
             spline.SplineDecorator.GenerateKnobs();
         }
     }
-
-    /// <summary>
-    /// Removes null entries in Spline Lists
-    /// </summary>
-    private void RemoveRenundantSplinesFromArrays()
-    {
-        //outgoingSplines.RemoveAll(item => item == null);
-        //incomingSplines.RemoveAll(item => item == null);
-    }
-
     #endregion
 
 }
