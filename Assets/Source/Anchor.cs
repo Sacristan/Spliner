@@ -132,22 +132,15 @@ public class Anchor : MonoBehaviour
 
         foreach (Anchor anchor in _incomingAnchors)
         {
-            if (anchor != null)
-            {
-                anchor.SyncOutgoingAnchor(this);
-            }
+            if (anchor != null) anchor.SyncOutgoingAnchor(this);
         }
 
         foreach (Anchor anchor in _outgoingAnchors)
         {
-            if (anchor != null)
-            {
-                anchor.SyncIncomingAnchor(this);
-            }
+            if (anchor != null) anchor.SyncIncomingAnchor(this);
         }
 
         SyncAndCleanupAnchors();
-        //CleanupAndAddSplinesIfRequired();
     }
 
     public void SyncIncomingAnchor(Anchor anchor)
@@ -178,6 +171,7 @@ public class Anchor : MonoBehaviour
             if (!this._outgoingAnchors.Contains(anchor))
             {
                 this._outgoingAnchors.Add(anchor);
+                AddOutgoingSpline(anchor);
             }
         }
     }
