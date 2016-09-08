@@ -13,29 +13,29 @@ public class Anchor : MonoBehaviour
     private List<Anchor> _incomingAnchors;
 
     #region Properties
-    public Anchor[] OutgoingAnchors
+    public List<Anchor> OutgoingAnchors
     {
         get
         {
-            return _outgoingAnchors.ToArray();
+            return _outgoingAnchors;
         }
 
         set
         {
-            _outgoingAnchors = new List<Anchor>(value);
+            _outgoingAnchors = value;
         }
     }
 
-    public Anchor[] IncomingAnchors
+    public List<Anchor> IncomingAnchors
     {
         get
         {
-            return _incomingAnchors.ToArray();
+            return _incomingAnchors;
         }
 
         set
         {
-            _incomingAnchors = new List<Anchor>(value);
+            _incomingAnchors = value;
         }
     }
 
@@ -130,12 +130,19 @@ public class Anchor : MonoBehaviour
 
         foreach (Anchor anchor in _incomingAnchors)
         {
-            if (anchor != null) anchor.SyncOutgoingAnchor(this);
+            if (anchor != null)
+            {
+                anchor.SyncOutgoingAnchor(this);
+                
+            }
         }
 
         foreach (Anchor anchor in _outgoingAnchors)
         {
-            if (anchor != null) anchor.SyncIncomingAnchor(this);
+            if (anchor != null)
+            {
+                anchor.SyncIncomingAnchor(this);
+            }
         }
 
         SyncAndCleanupAnchors();
@@ -143,17 +150,25 @@ public class Anchor : MonoBehaviour
 
     public void SyncIncomingAnchor(Anchor anchor)
     {
-        if (!this._incomingAnchors.Contains(anchor) && this != anchor)
+        if (this == anchor)
         {
-            this._incomingAnchors.Add(anchor);
+            this._incomingAnchors.Remove(anchor);
+        }
+        else
+        {
+           if(!this._incomingAnchors.Contains(anchor)) this._incomingAnchors.Add(anchor);
         }
     }
 
     public void SyncOutgoingAnchor(Anchor anchor)
     {
-        if (!this._outgoingAnchors.Contains(anchor) && this != anchor)
+        if (this == anchor)
         {
-            this._outgoingAnchors.Add(anchor);
+            this._outgoingAnchors.Remove(anchor);
+        }
+        else
+        {
+            if(!this._outgoingAnchors.Contains(anchor)) this._outgoingAnchors.Add(anchor);
         }
     }
 
@@ -162,15 +177,9 @@ public class Anchor : MonoBehaviour
         Debug.Log("SyncAndCleanupAnchors");
         Anchor[] anchors = FindObjectsOfType<Anchor>();
 
-        foreach(Anchor anchor in anchors)
+        foreach (Anchor anchor in anchors)
         {
             if (anchor == this) continue;
-
-            anchor._incomingAnchors.RemoveAll(item => !item._outgoingAnchors.Contains(anchor));
-            anchor._outgoingAnchors.RemoveAll(item => !item._incomingAnchors.Contains(anchor));
-
-            //anchor._incomingAnchors.RemoveAll(item => item == null);
-            //anchor._outgoingAnchors.RemoveAll(item => item == null);
         }
 
     }
