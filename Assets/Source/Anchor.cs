@@ -116,26 +116,29 @@ public class Anchor : MonoBehaviour
 
         foreach (Anchor anchor in _outgoingAnchors)
         {
-            Debug.DrawLine(this.transform.position, anchor.transform.position, Color.cyan);
+            if(anchor!=null) Debug.DrawLine(this.transform.position, anchor.transform.position, Color.cyan);
         }
     }
 
 
     #endregion
 
+    #region Anchor Sync
     public void SyncAnchors()
     {
         Debug.Log("Syncing Anchors...");
 
-        foreach(Anchor anchor in _incomingAnchors)
+        foreach (Anchor anchor in _incomingAnchors)
         {
-            if (anchor !=null) anchor.SyncOutgoingAnchor(this);
+            if (anchor != null) anchor.SyncOutgoingAnchor(this);
         }
 
         foreach (Anchor anchor in _outgoingAnchors)
         {
             if (anchor != null) anchor.SyncIncomingAnchor(this);
         }
+
+        SyncAndCleanupAnchors();
     }
 
     public void SyncIncomingAnchor(Anchor anchor)
@@ -153,6 +156,25 @@ public class Anchor : MonoBehaviour
             this._outgoingAnchors.Add(anchor);
         }
     }
+
+    private void SyncAndCleanupAnchors()
+    {
+        Debug.Log("SyncAndCleanupAnchors");
+        Anchor[] anchors = FindObjectsOfType<Anchor>();
+
+        foreach(Anchor anchor in anchors)
+        {
+            if (anchor == this) continue;
+
+            anchor._incomingAnchors.RemoveAll(item => !item._outgoingAnchors.Contains(anchor));
+            anchor._outgoingAnchors.RemoveAll(item => !item._incomingAnchors.Contains(anchor));
+
+            //anchor._incomingAnchors.RemoveAll(item => item == null);
+            //anchor._outgoingAnchors.RemoveAll(item => item == null);
+        }
+
+    }
+    #endregion
 
     #region Spline methods
 
