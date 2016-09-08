@@ -28,9 +28,6 @@ public class AnchorEditor : Editor
             //    Handles.DrawLine(anchor.transform.position, anchor.NextAnchor.transform.position);
             //}
 
-            anchor.AddSplinesIfRequired();
-            anchor.DecorateOutgoingSplines();
-
             foreach(BezierSpline spline in anchor.OutgoingSplines)
             {
                 DrawHandlesAndBezierSpline(spline);
@@ -70,11 +67,11 @@ public class AnchorEditor : Editor
 
             Handles.color = prevColor;
 
-            Handles.DrawBezier(p0, p3, p1, p2, Color.yellow, null, 2f);
+            Handles.DrawBezier(p0, p3, p1, p2, Color.green, null, 2f);
 
             p0 = p3;
         }
-        spline.SplineDecorator.GenerateKnobs();
+        spline.Decorate();
     }
 
     private Vector3 ShowPoint(int index, BezierSpline spline)

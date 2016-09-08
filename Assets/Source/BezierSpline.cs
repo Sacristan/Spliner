@@ -29,16 +29,6 @@ public class BezierSpline : MonoBehaviour
         get { return StartAnchor == null || EndAnchor == null; }
     }
 
-    public Anchor IncomingAnchor
-    {
-        get { return null; }
-    }
-
-    public Anchor OutgoingAnchor
-    {
-        get { return null; }
-    }
-
     public Knob[] Knobs
     {
         get { return new Knob[0]; }
@@ -56,7 +46,7 @@ public class BezierSpline : MonoBehaviour
     void Update()
     {
         if (Application.isPlaying || IsDirty) return;
-        Debug.DrawLine(StartPoint, EndPoint, Color.cyan);
+        Debug.DrawLine(StartPoint, EndPoint, Color.yellow);
 
         SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
         SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
@@ -145,6 +135,11 @@ public class BezierSpline : MonoBehaviour
         spline.gameObject.name = "Spline_" + System.Guid.NewGuid();
 
         return spline;
+    }
+
+    public void Decorate()
+    {
+        SplineDecorator.GenerateKnobs();
     }
 
     public void MarkForDestruction()

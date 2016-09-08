@@ -6,6 +6,6 @@ public class BezierSplineInspector : Editor
 {
     public override void OnInspectorGUI()
     {
-
+        DrawDefaultInspector();
     }
 }

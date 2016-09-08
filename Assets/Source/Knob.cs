@@ -15,7 +15,7 @@ public class Knob : MonoBehaviour
     {
         get
         {
-            if (Spline != null) return Spline.OutgoingAnchor;
+            if (Spline != null) return Spline.StartAnchor;
             return null;
         }
     }
@@ -25,7 +25,7 @@ public class Knob : MonoBehaviour
     {
         get
         {
-            if (Spline != null) return Spline.IncomingAnchor;
+            if (Spline != null) return Spline.EndAnchor;
             return null;
         }
     }
