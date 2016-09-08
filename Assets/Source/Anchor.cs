@@ -180,6 +180,13 @@ public class Anchor : MonoBehaviour
         foreach (Anchor anchor in anchors)
         {
             if (anchor == this) continue;
+
+            if (anchor._incomingAnchors.Contains(this) && !this._outgoingAnchors.Contains(anchor))
+                anchor._incomingAnchors.RemoveAll(item => item == this);
+
+            if (anchor._outgoingAnchors.Contains(this) && !this._incomingAnchors.Contains(anchor))
+                anchor._outgoingAnchors.RemoveAll(item => item == this);
+
         }
 
     }
