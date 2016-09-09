@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 
-[ExecuteInEditMode]
 public class BezierSpline : MonoBehaviour
 {
     [SerializeField]
@@ -31,7 +30,7 @@ public class BezierSpline : MonoBehaviour
 
     public Knob[] Knobs
     {
-        get { return new Knob[0]; }
+        get { return DecoratorContainer.GetComponentsInChildren<Knob>(); }
     }
 
     public SplineDecorator SplineDecorator
