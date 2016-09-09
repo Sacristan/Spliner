@@ -41,11 +41,6 @@ public class SplineDecorator : MonoBehaviour
         get { return Spline.DecoratorContainer; }
     }
 
-    //void Awake()
-    //{
-    //    GenerateKnobs();
-    //}
-
     public void GenerateKnobs()
     {
         if (Application.isPlaying) return;
@@ -53,7 +48,7 @@ public class SplineDecorator : MonoBehaviour
 
         float stepSize = 1f / StepSize;
 
-        for (int i = 0; i < PointsRequiredOnSpline; i++)
+        for (int i = 1; i < PointsRequiredOnSpline-1; i++)
         {
             float stepNormalized = (i * stepSize);
 
