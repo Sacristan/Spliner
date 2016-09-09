@@ -35,17 +35,11 @@ public class SplineDecorator : MonoBehaviour
         }
     }
 
-    private Transform DecoratorContainer
-    {
-        get { return Spline.DecoratorContainer; }
-    }
-
-
     public Knob[] Knobs
     {
         get
         {
-            return Spline.DecoratorContainer.GetComponentsInChildren<Knob>();
+            return Spline.Knobs;
         }
     }
 
@@ -73,7 +67,7 @@ public class SplineDecorator : MonoBehaviour
 
     private void Cleanup()
     {
-        foreach ( Knob knob in DecoratorContainer.GetComponentsInChildren<Knob>())
+        foreach ( Knob knob in Spline.DecoratorContainer.GetComponentsInChildren<Knob>())
             DestroyImmediate(knob.gameObject);
     }
 }
