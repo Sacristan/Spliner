@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 
-[ExecuteInEditMode]
 public class Anchor : MonoBehaviour
 {
     [SerializeField]

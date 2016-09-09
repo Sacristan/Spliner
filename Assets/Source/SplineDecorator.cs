@@ -2,7 +2,6 @@
 using System.Collections;
 
 [RequireComponent(typeof(BezierSpline))]
-[ExecuteInEditMode]
 public class SplineDecorator : MonoBehaviour
 {
     private BezierSpline spline;
