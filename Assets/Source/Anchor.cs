@@ -284,13 +284,15 @@ public class Anchor : MonoBehaviour
     #endregion
 
 
+    #region Knob Sync
+
     public void RepopulateKnobs()
     {
-        this._outgoingKnobs = FetchKnobs(OutgoingSplines);
+        this.OutgoingKnobs = FetchKnobs(OutgoingSplines);
 
         foreach(Anchor anchor in OutgoingAnchors)
         {
-            if(anchor != null) anchor._incomingKnobs = this._outgoingKnobs;
+            if(anchor != null) anchor.IncomingKnobs = this.OutgoingKnobs;
         }
     }
 
@@ -311,5 +313,7 @@ public class Anchor : MonoBehaviour
         knobsList.RemoveAll(item => item == null);
         return knobsList.ToArray();
     }
+
+    #endregion
 
 }
