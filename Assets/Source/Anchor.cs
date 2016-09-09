@@ -268,7 +268,7 @@ public class Anchor : MonoBehaviour
     {
         List<BezierSpline> splinesMap = new List<BezierSpline>();
          
-        foreach(BezierSpline spline in list)
+        foreach(BezierSpline spline in list.ToArray())
         {
             if (spline == null || splinesMap.Contains(spline))
                 list.Remove(spline);

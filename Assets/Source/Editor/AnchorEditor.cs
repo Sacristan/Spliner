@@ -25,7 +25,7 @@ public class AnchorEditor : Editor
 
                 foreach (BezierSpline spline in anchor.OutgoingSplines.ToArray())
                 {
-                    //if (spline == null) continue;
+                    if (spline == null) continue;
 
                     spline.SetControlPoints();
                     DrawHandlesAndBezierSpline(spline);

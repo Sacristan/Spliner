@@ -123,7 +123,7 @@ public class BezierSpline : MonoBehaviour
         spline._endAnchor = endAnchor;
 
         spline.transform.SetParent(AnchorManager.SplineContainer.transform);
-        spline.gameObject.name = "Spline_" + System.Guid.NewGuid();
+        spline.gameObject.name = string.Format("Spline_{0}->{1}_{2}",spline.StartAnchor.gameObject.name, spline.EndAnchor.gameObject.name, System.Guid.NewGuid());
 
         return spline;
     }
