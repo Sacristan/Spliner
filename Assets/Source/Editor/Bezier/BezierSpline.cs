@@ -1,9 +1,21 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
 
-public class BezierSpline : MonoBehaviour
+public class BezierSpline
 {
+    private Spline _spline;
+
+    public Spline Spline
+    {
+        get { return _spline; }
+    }
+
+    public BezierSpline(Spline spline)
+    {
+        _spline = spline;
+        //TODO: calculate points here
+    }
+
     [SerializeField]
     private Vector3[] points;
 
@@ -11,23 +23,6 @@ public class BezierSpline : MonoBehaviour
     private BezierControlPointMode[] modes;
 
     private bool loop;
-
-    //TODO: FIX ME
-    private Anchor StartAnchor
-    {
-        get { return null; }
-    }
-
-    //TODO: FIX ME
-    private Anchor EndAnchor
-    {
-        get { return null; }
-    }
-
-    public bool IsDirty
-    {
-        get { return StartAnchor == null || EndAnchor == null; }
-    }
 
     public Vector3 StartPoint
     {
@@ -77,13 +72,13 @@ public class BezierSpline : MonoBehaviour
         }
     }
 
-    public void SetControlPoints()
-    {
-        Debug.DrawLine(StartPoint, EndPoint, Color.red);
+    //public void SetControlPoints()
+    //{
+    //    Debug.DrawLine(StartPoint, EndPoint, Color.red);
 
-        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
-        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
-    }
+    //    SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
+    //    SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
+    //}
 
     public Vector3 GetControlPoint(int index)
     {
@@ -224,7 +219,7 @@ public class BezierSpline : MonoBehaviour
             t -= i;
             i *= 3;
         }
-        return transform.TransformPoint(Bezier.GetPoint(points[i], points[i + 1], points[i + 2], points[i + 3], t));
+        return Spline.transform.TransformPoint(Bezier.GetPoint(points[i], points[i + 1], points[i + 2], points[i + 3], t));
     }
 
     public Vector3 GetVelocity(float t)
@@ -242,7 +237,7 @@ public class BezierSpline : MonoBehaviour
             t -= i;
             i *= 3;
         }
-        return transform.TransformPoint(Bezier.GetFirstDerivative(points[i], points[i + 1], points[i + 2], points[i + 3], t)) - transform.position;
+        return Spline.transform.TransformPoint(Bezier.GetFirstDerivative(points[i], points[i + 1], points[i + 2], points[i + 3], t)) - Spline.transform.position;
     }
 
     public Vector3 GetDirection(float t)

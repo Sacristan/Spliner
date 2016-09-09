@@ -68,7 +68,7 @@ public class AnchorSpliner
 
     private static void AddSpline(Anchor fromAnchor, Anchor toAnchor)
     {
-        BezierSpline spline = BezierSpline.Create(fromAnchor, toAnchor);
+        Spline spline = Spline.Create(fromAnchor, toAnchor);
         toAnchor.IncomingSplines.Add(spline);
         fromAnchor.OutgoingSplines.Add(spline);
 
@@ -77,11 +77,11 @@ public class AnchorSpliner
     }
 
 
-    private static void RemoveRenundantSplinesFor(List<BezierSpline> list)
+    private static void RemoveRenundantSplinesFor(List<Spline> list)
     {
-        List<BezierSpline> splinesMap = new List<BezierSpline>();
+        List<Spline> splinesMap = new List<Spline>();
 
-        foreach (BezierSpline spline in list.ToArray())
+        foreach (Spline spline in list.ToArray())
         {
             if (spline == null || splinesMap.Contains(spline))
                 list.Remove(spline);

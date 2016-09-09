@@ -26,8 +26,6 @@ public class AnchorEditor : Editor
                 foreach (Spline spline in anchor.OutgoingSplines.ToArray())
                 {
                     if (spline == null) continue;
-
-                    spline.SetControlPoints();
                     DrawHandlesAndBezierSpline(spline);
                 }
 
@@ -59,15 +57,18 @@ public class AnchorEditor : Editor
     private void DrawHandlesAndBezierSpline(Spline spline)
     {
         if (spline == null) return;
-        Vector3 p0 = ShowPoint(0, spline);
+
+        BezierSpline bezierSpline = new BezierSpline(spline);
+
+        Vector3 p0 = ShowPoint(0, bezierSpline);
 
         //Debug.Log(spline.ControlPointCount);
 
-        for (int i = 1; i < spline.ControlPointCount; i += 3)
+        for (int i = 1; i < bezierSpline.ControlPointCount; i += 3)
         {
-            Vector3 p1 = ShowPoint(i, spline);
-            Vector3 p2 = ShowPoint(i + 1, spline);
-            Vector3 p3 = ShowPoint(i + 2, spline);
+            Vector3 p1 = ShowPoint(i, bezierSpline);
+            Vector3 p2 = ShowPoint(i + 1, bezierSpline);
+            Vector3 p3 = ShowPoint(i + 2, bezierSpline);
 
             Color prevColor = Handles.color;
 
@@ -81,12 +82,22 @@ public class AnchorEditor : Editor
 
             p0 = p3;
         }
-        spline.Decorate();
+
+        //TODO: FIXME
+        //spline.Decorate();
+
+        //public void SetControlPoints()
+        //{
+        //    Debug.DrawLine(StartPoint, EndPoint, Color.red);
+
+        //    SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
+        //    SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
+        //}
     }
 
     private Vector3 ShowPoint(int index, BezierSpline spline)
     {
-        Transform handleTransform = spline.transform;
+        Transform handleTransform = spline.Spline.transform;
         Quaternion handleRotation = Tools.pivotRotation == PivotRotation.Local ?
             handleTransform.rotation : Quaternion.identity;
 
@@ -102,8 +113,8 @@ public class AnchorEditor : Editor
 
         if (EditorGUI.EndChangeCheck())
         {
-            Undo.RecordObject(spline, "Move Point");
-            EditorUtility.SetDirty(spline);
+            //Undo.RecordObject(spline, "Move Point");
+            //EditorUtility.SetDirty(spline);
             spline.SetControlPoint(index, handleTransform.InverseTransformPoint(point));
         }
         return point;
