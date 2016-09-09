@@ -5,8 +5,6 @@ using System.Collections;
 [ExecuteInEditMode]
 public class Anchor : MonoBehaviour
 {
-    [Header("Do not Edit")]
-
     [SerializeField]
     private Knob[] _incomingKnobs;
 
@@ -107,91 +105,6 @@ public class Anchor : MonoBehaviour
     }
 
     #endregion
-
-    #region Spline methods
-
-    public void AddIncomingSpline(Anchor anchor)
-    {
-        BezierSpline spline = BezierSpline.Create(anchor, this);
-        this.IncomingSplines.Add(spline);
-        anchor.OutgoingSplines.Add(spline);
-        this.CleanupSplines();
-    }
-
-    public void AddOutgoingSpline(Anchor anchor)
-    {
-        BezierSpline spline = BezierSpline.Create(this, anchor);
-        this.OutgoingSplines.Add(spline);
-        anchor.IncomingSplines.Add(spline);
-        this.CleanupSplines();
-    }
-
-    public void CleanupIncomingSplinesWithAnchor(Anchor anchor)
-    {
-        Debug.Log("CleanupIncomingSplinesWithAnchor");
-
-        foreach (BezierSpline spline in IncomingSplines.ToArray())
-        {
-            if (spline == null) continue;
-            if (spline.StartAnchor == anchor)
-            {
-                this.IncomingSplines.RemoveAll(item => item == spline);
-                anchor.OutgoingSplines.RemoveAll(item => item == spline);
-                spline.MarkForDestruction();
-            }
-        }
-
-        this.CleanupSplines();
-    }
-
-    public void CleanupOutgoingSplinesWithAnchor(Anchor anchor)
-    {
-        Debug.Log("CleanupOutgoingSplinesWithAnchor");
-
-        foreach (BezierSpline spline in OutgoingSplines.ToArray())
-        {
-            if (spline == null) continue;
-            if (spline.EndAnchor == anchor)
-            {
-                this.OutgoingSplines.RemoveAll(item => item == spline);
-                anchor.IncomingSplines.RemoveAll(item => item == spline);
-                spline.MarkForDestruction();
-            }
-        }
-
-        this.CleanupSplines();
-    }
-
-    public void DecorateOutgoingSplines()
-    {
-        foreach (BezierSpline spline in this.IncomingSplines)
-        {
-            if (spline == null) continue;
-            spline.Decorate();
-        }
-    }
-
-    public void CleanupSplines()
-    {
-        this.RemoveRenundantSplinesFor(OutgoingSplines);
-        this.RemoveRenundantSplinesFor(IncomingSplines);
-    }
-
-    private void RemoveRenundantSplinesFor(List<BezierSpline> list)
-    {
-        List<BezierSpline> splinesMap = new List<BezierSpline>();
-
-        foreach (BezierSpline spline in list.ToArray())
-        {
-            if (spline == null || splinesMap.Contains(spline))
-                list.Remove(spline);
-            else
-                splinesMap.Add(spline);
-        }
-    }
-
-    #endregion
-
 
     #region Knob Sync
 

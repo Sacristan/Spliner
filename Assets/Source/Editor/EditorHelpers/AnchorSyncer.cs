@@ -25,14 +25,14 @@ public class AnchorSyncer
         if (toAnchor == fromAnchor)
         {
             toAnchor.IncomingAnchors.RemoveAll(item => item == fromAnchor);
-            toAnchor.AddOutgoingSpline(fromAnchor);
+            AnchorSpliner.AddOutgoingSpline(toAnchor, fromAnchor);
         }
         else
         {
             if (!toAnchor.IncomingAnchors.Contains(fromAnchor))
             {
                 toAnchor.IncomingAnchors.Add(fromAnchor);
-                toAnchor.AddIncomingSpline(fromAnchor);
+                AnchorSpliner.AddIncomingSpline(toAnchor, fromAnchor);
             }
         }
     }
@@ -42,13 +42,14 @@ public class AnchorSyncer
         if (toAnchor == fromAnchor)
         {
             toAnchor.OutgoingAnchors.RemoveAll(item => item == fromAnchor);
+            AnchorSpliner.AddIncomingSpline(toAnchor, fromAnchor);
         }
         else
         {
             if (!toAnchor.OutgoingAnchors.Contains(fromAnchor))
             {
                 toAnchor.OutgoingAnchors.Add(fromAnchor);
-                toAnchor.AddOutgoingSpline(fromAnchor);
+                AnchorSpliner.AddOutgoingSpline(toAnchor, fromAnchor);
             }
         }
     }
@@ -69,7 +70,7 @@ public class AnchorSyncer
                 {
                     if (incomingAnchor == targetAnchor)
                     {
-                        anchor.CleanupIncomingSplinesWithAnchor(targetAnchor);
+                        AnchorSpliner.CleanupIncomingSplinesWithAnchor(anchor, targetAnchor);
                         anchor.IncomingAnchors.RemoveAll(item => item == targetAnchor);
                     }
                 }
@@ -81,14 +82,14 @@ public class AnchorSyncer
                 {
                     if (outgoingAnchor == targetAnchor)
                     {
-                        anchor.CleanupOutgoingSplinesWithAnchor(targetAnchor);
+                        AnchorSpliner.CleanupIncomingSplinesWithAnchor(anchor, targetAnchor);
                         anchor.OutgoingAnchors.RemoveAll(item => item == targetAnchor);
                     }
                 }
             }
         }
 
-        targetAnchor.CleanupSplines();
+        AnchorSpliner.CleanupSplines(targetAnchor);
     }
 
     #endregion
