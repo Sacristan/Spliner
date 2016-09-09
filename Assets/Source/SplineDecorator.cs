@@ -67,6 +67,7 @@ public class SplineDecorator : MonoBehaviour
 
             itemSpawned.transform.localPosition = position;
             itemSpawned.transform.SetParent(spline.DecoratorContainer);
+            itemSpawned.gameObject.name = "Knob"+i;
         }
 
     }
