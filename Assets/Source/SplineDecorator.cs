@@ -74,9 +74,7 @@ public class SplineDecorator : MonoBehaviour
 
     private void Cleanup()
     {
-        foreach (Transform child in DecoratorContainer.transform)
-        {
-            DestroyImmediate(child.gameObject);
-        }
+        foreach ( Knob knob in DecoratorContainer.GetComponentsInChildren<Knob>())
+            DestroyImmediate(knob.gameObject);
     }
 }
