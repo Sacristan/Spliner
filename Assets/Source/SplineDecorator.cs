@@ -8,15 +8,8 @@ public class SplineDecorator : MonoBehaviour
     private BezierSpline spline;
     public Transform knobTemplate;
 
-    private const float DISTANCE_PER_KNOB = 75f;
-    private const float OFFET_FROM_BORDERS = 50f;
-
-    float lastLength = 0f;
-
-    bool inChange = false;
-
-    float handleLengthChangeCallRateInSeconds = 0.5f;
-    float handleLengthChangedLastCalled = 0f;
+    [SerializeField]
+    private float distancePerKnob = 75f;
 
     private BezierSpline Spline
     {
@@ -31,7 +24,7 @@ public class SplineDecorator : MonoBehaviour
     {
         get
         {
-            return Spline.Length / DISTANCE_PER_KNOB;
+            return Spline.Length / distancePerKnob;
         }
     }
 
@@ -48,10 +41,10 @@ public class SplineDecorator : MonoBehaviour
         get { return Spline.DecoratorContainer; }
     }
 
-    void Awake()
-    {
-        GenerateKnobs();
-    }
+    //void Awake()
+    //{
+    //    GenerateKnobs();
+    //}
 
     public void GenerateKnobs()
     {
@@ -59,12 +52,10 @@ public class SplineDecorator : MonoBehaviour
         Cleanup();
 
         float stepSize = 1f / StepSize;
-        //float offSetNormalized = 1f / OFFET_FROM_BORDERS;
 
         for (int i = 0; i < PointsRequiredOnSpline; i++)
         {
             float stepNormalized = (i * stepSize);
-            //if (stepNormalized < offSetNormalized || stepNormalized >= (1 - offSetNormalized)) continue;
 
             Transform itemSpawned = Instantiate(knobTemplate) as Transform;
 

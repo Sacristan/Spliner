@@ -5,15 +5,12 @@ using UnityEditor;
 public class AnchorEditor : Editor
 {
     Anchor targetAnchor;
-    SerializedObject SerializedTargetAnchor;
-    //SerializedProperty NextAnchorProperty;
 
     private bool editorCalled = false;
 
     void OnEnable()
     {
         targetAnchor = (Anchor)target;
-        SerializedTargetAnchor = new SerializedObject(targetAnchor);
     }
 
     private void OnSceneGUI()
