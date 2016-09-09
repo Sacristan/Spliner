@@ -36,8 +36,7 @@ public class AnchorEditor : Editor
                     if (outgoingAnchor != null) Debug.DrawLine(anchor.transform.position, outgoingAnchor.transform.position, Color.cyan);
                 }
 
-                anchor.RepopulateKnobs();
-
+                AnchorKnobSyncer.RepopulateKnobs(anchor);
             }
         }
         else

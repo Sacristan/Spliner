@@ -105,37 +105,4 @@ public class Anchor : MonoBehaviour
     }
 
     #endregion
-
-    #region Knob Sync
-
-    public void RepopulateKnobs()
-    {
-        this.OutgoingKnobs = FetchKnobs(OutgoingSplines);
-
-        foreach(Anchor anchor in OutgoingAnchors)
-        {
-            if(anchor != null) anchor.IncomingKnobs = this.OutgoingKnobs;
-        }
-    }
-
-    private Knob[] FetchKnobs(List<BezierSpline> splines)
-    {
-        List<Knob> knobsList = new List<Knob>();
-
-        foreach (BezierSpline spline in splines)
-        {
-            if (spline == null) continue;
-            foreach (Knob knob in spline.SplineDecorator.Knobs)
-            {
-                if (knob != null && !knobsList.Contains(knob))
-                    knobsList.Add(knob);
-            }
-        }
-
-        knobsList.RemoveAll(item => item == null);
-        return knobsList.ToArray();
-    }
-
-    #endregion
-
 }
