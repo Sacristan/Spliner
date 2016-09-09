@@ -55,12 +55,16 @@ public class Anchor : MonoBehaviour
         }
     }
 
-    //TODO: Take from incoming anchors
     public List<BezierSpline> IncomingSplines
     {
         get
         {
             return _incomingSplines;
+        }
+
+        set
+        {
+            _incomingSplines = value;
         }
     }
 
@@ -70,6 +74,11 @@ public class Anchor : MonoBehaviour
         {
             return _outgoingSplines;
         }
+
+        set
+        {
+            _outgoingSplines = value;
+        }
     }
 
     public Knob[] OutgoingKnobs
@@ -77,6 +86,11 @@ public class Anchor : MonoBehaviour
         get
         {
             return _outgoingKnobs;
+        }
+
+        set
+        {
+            _outgoingKnobs = value;
         }
     }
 
@@ -99,12 +113,12 @@ public class Anchor : MonoBehaviour
     {
         //Debug.Log("Syncing Anchors...");
 
-        foreach (Anchor anchor in _incomingAnchors)
+        foreach (Anchor anchor in IncomingAnchors)
         {
             if (anchor != null) anchor.SyncOutgoingAnchor(this);
         }
 
-        foreach (Anchor anchor in _outgoingAnchors)
+        foreach (Anchor anchor in OutgoingAnchors)
         {
             if (anchor != null) anchor.SyncIncomingAnchor(this);
         }
@@ -116,15 +130,15 @@ public class Anchor : MonoBehaviour
     {
         if (this == anchor)
         {
-            this._incomingAnchors.RemoveAll(item => item == anchor);
-            AddOutgoingSpline(anchor);
+            this.IncomingAnchors.RemoveAll(item => item == anchor);
+            this.AddOutgoingSpline(anchor);
         }
         else
         {
-            if (!this._incomingAnchors.Contains(anchor))
+            if (!this.IncomingAnchors.Contains(anchor))
             {
-                this._incomingAnchors.Add(anchor);
-                AddIncomingSpline(anchor);
+                this.IncomingAnchors.Add(anchor);
+                this.AddIncomingSpline(anchor);
             }
         }
     }
@@ -133,14 +147,14 @@ public class Anchor : MonoBehaviour
     {
         if (this == anchor)
         {
-            this._outgoingAnchors.RemoveAll(item => item == anchor);
+            this.OutgoingAnchors.RemoveAll(item => item == anchor);
         }
         else
         {
-            if (!this._outgoingAnchors.Contains(anchor))
+            if (!this.OutgoingAnchors.Contains(anchor))
             {
-                this._outgoingAnchors.Add(anchor);
-                AddOutgoingSpline(anchor);
+                this.OutgoingAnchors.Add(anchor);
+                this.AddOutgoingSpline(anchor);
             }
         }
     }
@@ -154,34 +168,34 @@ public class Anchor : MonoBehaviour
         {
             if (anchor == this) continue;
 
-            if (anchor._incomingAnchors.Contains(this) && !this._outgoingAnchors.Contains(anchor))
+            if (anchor.IncomingAnchors.Contains(this) && !this.OutgoingAnchors.Contains(anchor))
             {
-                //anchor._incomingAnchors.RemoveAll(item => item == this);
+                //anchor.IncomingAnchors.RemoveAll(item => item == this);
 
-                foreach (Anchor incomingAnchor in anchor._incomingAnchors.ToArray())
+                foreach (Anchor incomingAnchor in anchor.IncomingAnchors.ToArray())
                 {
                     if (incomingAnchor == this)
                     {
                         anchor.CleanupIncomingSplinesWithAnchor(this);
-                        anchor._incomingAnchors.RemoveAll(item => item == this);
+                        anchor.IncomingAnchors.RemoveAll(item => item == this);
                     }
                 }
             }
 
-            if (anchor._outgoingAnchors.Contains(this) && !this._incomingAnchors.Contains(anchor))
+            if (anchor.OutgoingAnchors.Contains(this) && !this.IncomingAnchors.Contains(anchor))
             {
-                foreach (Anchor outgoingAnchor in anchor._outgoingAnchors.ToArray())
+                foreach (Anchor outgoingAnchor in anchor.OutgoingAnchors.ToArray())
                 {
                     if (outgoingAnchor == this)
                     {
                         anchor.CleanupOutgoingSplinesWithAnchor(this);
-                        anchor._outgoingAnchors.RemoveAll(item => item == this);
+                        anchor.OutgoingAnchors.RemoveAll(item => item == this);
                     }
                 }
             }
         }
 
-        CleanupSplines();
+        this.CleanupSplines();
     }
     #endregion
 
@@ -190,61 +204,58 @@ public class Anchor : MonoBehaviour
     private void AddIncomingSpline(Anchor anchor)
     {
         BezierSpline spline = BezierSpline.Create(anchor, this);
-        _incomingSplines.Add(spline);
-        anchor._outgoingSplines.Add(spline);
-        CleanupSplines();
+        this.IncomingSplines.Add(spline);
+        anchor.OutgoingSplines.Add(spline);
+        this.CleanupSplines();
     }
 
     private void AddOutgoingSpline(Anchor anchor)
     {
         BezierSpline spline = BezierSpline.Create(this, anchor);
-        _outgoingSplines.Add(spline);
-        anchor._incomingSplines.Add(spline);
-        CleanupSplines();
+        this.OutgoingSplines.Add(spline);
+        anchor.IncomingSplines.Add(spline);
+        this.CleanupSplines();
     }
 
     public void CleanupIncomingSplinesWithAnchor(Anchor anchor)
     {
         Debug.Log("CleanupIncomingSplinesWithAnchor");
 
-        foreach (BezierSpline spline in _incomingSplines.ToArray())
+        foreach (BezierSpline spline in IncomingSplines.ToArray())
         {
             if (spline == null) continue;
             if (spline.StartAnchor == anchor)
             {
-                _incomingSplines.RemoveAll(item => item == spline);
-                anchor._outgoingSplines.RemoveAll(item => item == spline);
+                this.IncomingSplines.RemoveAll(item => item == spline);
+                anchor.OutgoingSplines.RemoveAll(item => item == spline);
                 spline.MarkForDestruction();
             }
         }
 
-        CleanupSplines();
+        this.CleanupSplines();
     }
 
     public void CleanupOutgoingSplinesWithAnchor(Anchor anchor)
     {
         Debug.Log("CleanupOutgoingSplinesWithAnchor");
 
-        foreach (BezierSpline spline in _outgoingSplines.ToArray())
+        foreach (BezierSpline spline in OutgoingSplines.ToArray())
         {
             if (spline == null) continue;
             if (spline.EndAnchor == anchor)
             {
-                _outgoingSplines.RemoveAll(item => item == spline);
-                anchor._incomingSplines.RemoveAll(item => item == spline);
+                this.OutgoingSplines.RemoveAll(item => item == spline);
+                anchor.IncomingSplines.RemoveAll(item => item == spline);
                 spline.MarkForDestruction();
             }
         }
 
-        CleanupSplines();
+        this.CleanupSplines();
     }
 
-    /// <summary>
-    /// Decorates Outgoing Splines with Knobs
-    /// </summary>
     public void DecorateOutgoingSplines()
     {
-        foreach (BezierSpline spline in IncomingSplines)
+        foreach (BezierSpline spline in this.IncomingSplines)
         {
             if (spline == null) continue;
             spline.Decorate();
@@ -253,8 +264,8 @@ public class Anchor : MonoBehaviour
 
     private void CleanupSplines()
     {
-        RemoveRenundantSplinesFor(_outgoingSplines);
-        RemoveRenundantSplinesFor(_incomingSplines);
+        this.RemoveRenundantSplinesFor(OutgoingSplines);
+        this.RemoveRenundantSplinesFor(IncomingSplines);
     }
 
     private void RemoveRenundantSplinesFor(List<BezierSpline> list)
@@ -275,11 +286,11 @@ public class Anchor : MonoBehaviour
 
     public void RepopulateKnobs()
     {
-        _outgoingKnobs = FetchKnobs(OutgoingSplines);
+        this._outgoingKnobs = FetchKnobs(OutgoingSplines);
 
         foreach(Anchor anchor in OutgoingAnchors)
         {
-           if(anchor!=null) anchor._incomingKnobs = _outgoingKnobs;
+            if(anchor != null) anchor._incomingKnobs = this._outgoingKnobs;
         }
     }
 
