@@ -41,6 +41,15 @@ public class SplineDecorator : MonoBehaviour
         get { return Spline.DecoratorContainer; }
     }
 
+
+    public Knob[] Knobs
+    {
+        get
+        {
+            return Spline.DecoratorContainer.GetComponentsInChildren<Knob>();
+        }
+    }
+
     public void GenerateKnobs()
     {
         if (Application.isPlaying) return;
@@ -69,5 +78,4 @@ public class SplineDecorator : MonoBehaviour
             DestroyImmediate(child.gameObject);
         }
     }
-
 }

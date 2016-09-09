@@ -6,6 +6,13 @@ using System.Collections;
 public class Anchor : MonoBehaviour
 {
     [Header("Do not Edit")]
+
+    [SerializeField]
+    private Knob[] _incomingKnobs;
+
+    [SerializeField]
+    private Knob[] _outgoingKnobs;
+
     [SerializeField]
     private List<BezierSpline> _outgoingSplines = new List<BezierSpline>();
 
@@ -19,6 +26,7 @@ public class Anchor : MonoBehaviour
 
     [SerializeField]
     private List<Anchor> _incomingAnchors = new List<Anchor>();
+
 
     #region Properties
     public List<Anchor> OutgoingAnchors
@@ -64,37 +72,21 @@ public class Anchor : MonoBehaviour
         }
     }
 
-    //TODO: Take from incoming splines
     public Knob[] OutgoingKnobs
     {
         get
         {
-            return new Knob[0];
+            return _outgoingKnobs;
         }
     }
 
-    //TODO: Take from outgoing splines
     public Knob[] IncomingKnobs
     {
         get
         {
-            return new Knob[0];
+            return _incomingKnobs;
         }
     }
-
-    #endregion
-
-    #region MonoBehaviour methods
-
-
-    //void Update()
-    //{
-    //    foreach (Anchor anchor in _outgoingAnchors)
-    //    {
-    //        if(anchor!=null) Debug.DrawLine(this.transform.position, anchor.transform.position, Color.cyan);
-    //    }
-    //}
-
 
     #endregion
 
@@ -185,7 +177,7 @@ public class Anchor : MonoBehaviour
             }
         }
 
-        RemoveRenundantSplinesFromArrays();
+        CleanupSplines();
     }
     #endregion
 
@@ -196,7 +188,7 @@ public class Anchor : MonoBehaviour
         BezierSpline spline = BezierSpline.Create(anchor, this);
         _incomingSplines.Add(spline);
         anchor._outgoingSplines.Add(spline);
-        RemoveRenundantSplinesFromArrays();
+        CleanupSplines();
     }
 
     private void AddOutgoingSpline(Anchor anchor)
@@ -204,7 +196,7 @@ public class Anchor : MonoBehaviour
         BezierSpline spline = BezierSpline.Create(this, anchor);
         _outgoingSplines.Add(spline);
         anchor._incomingSplines.Add(spline);
-        RemoveRenundantSplinesFromArrays();
+        CleanupSplines();
     }
 
     public void CleanupIncomingSplinesWithAnchor(Anchor anchor)
@@ -222,7 +214,7 @@ public class Anchor : MonoBehaviour
             }
         }
 
-        RemoveRenundantSplinesFromArrays();
+        CleanupSplines();
     }
 
     public void CleanupOutgoingSplinesWithAnchor(Anchor anchor)
@@ -240,7 +232,7 @@ public class Anchor : MonoBehaviour
             }
         }
 
-        RemoveRenundantSplinesFromArrays();
+        CleanupSplines();
     }
 
     /// <summary>
@@ -255,10 +247,7 @@ public class Anchor : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Removes null entries in Spline Lists
-    /// </summary>
-    private void RemoveRenundantSplinesFromArrays()
+    private void CleanupSplines()
     {
         RemoveRenundantSplinesFor(_outgoingSplines);
         RemoveRenundantSplinesFor(_incomingSplines);
@@ -267,8 +256,8 @@ public class Anchor : MonoBehaviour
     private void RemoveRenundantSplinesFor(List<BezierSpline> list)
     {
         List<BezierSpline> splinesMap = new List<BezierSpline>();
-         
-        foreach(BezierSpline spline in list.ToArray())
+
+        foreach (BezierSpline spline in list.ToArray())
         {
             if (spline == null || splinesMap.Contains(spline))
                 list.Remove(spline);
@@ -278,4 +267,29 @@ public class Anchor : MonoBehaviour
     }
 
     #endregion
+
+
+    public void RepopulateKnobs()
+    {
+        _incomingKnobs = FetchKnobs(IncomingSplines);
+        _outgoingKnobs = FetchKnobs(OutgoingSplines);
+    }
+
+    private Knob[] FetchKnobs(List<BezierSpline> splines)
+    {
+        List<Knob> knobsList = new List<Knob>();
+
+        foreach(BezierSpline spline in splines)
+        {
+            if (spline == null) continue;
+            foreach(Knob knob in spline.SplineDecorator.Knobs)
+            {
+                if(knob != null && !knobsList.Contains(knob))
+                    knobsList.Add(knob);
+            }
+        }
+
+       return knobsList.ToArray();
+    }
+
 }
