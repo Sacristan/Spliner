@@ -12,8 +12,6 @@ public class Anchor : MonoBehaviour
     [SerializeField]
     private List<BezierSpline> _incomingSplines = new List<BezierSpline>();
 
-    private List<BezierSpline> _allSplines = new List<BezierSpline>();
-
     [Header("Configure Anchor relations here")]
 
     [SerializeField]
@@ -63,22 +61,6 @@ public class Anchor : MonoBehaviour
         get
         {
             return _outgoingSplines;
-        }
-    }
-
-    public List<BezierSpline> AllSplines
-    {
-        get
-        {
-            if (_allSplines == null)
-            {
-                List<BezierSpline> a = IncomingSplines;
-                List<BezierSpline> b = OutgoingSplines;
-                a.AddRange(b);
-                _allSplines = a;
-            }
-
-            return _allSplines;
         }
     }
 
@@ -203,6 +185,7 @@ public class Anchor : MonoBehaviour
             }
         }
 
+        RemoveRenundantSplinesFromArrays();
     }
     #endregion
 
@@ -226,10 +209,11 @@ public class Anchor : MonoBehaviour
 
     public void CleanupIncomingSplinesWithAnchor(Anchor anchor)
     {
-        //Debug.Log("CleanupIncomingSplinesWithAnchor");
+        Debug.Log("CleanupIncomingSplinesWithAnchor");
 
         foreach (BezierSpline spline in _incomingSplines.ToArray())
         {
+            if (spline == null) continue;
             if (spline.StartAnchor == anchor)
             {
                 _incomingSplines.RemoveAll(item => item == spline);
@@ -243,10 +227,11 @@ public class Anchor : MonoBehaviour
 
     public void CleanupOutgoingSplinesWithAnchor(Anchor anchor)
     {
-        //Debug.Log("CleanupOutgoingSplinesWithAnchor");
+        Debug.Log("CleanupOutgoingSplinesWithAnchor");
 
         foreach (BezierSpline spline in _outgoingSplines.ToArray())
         {
+            if (spline == null) continue;
             if (spline.EndAnchor == anchor)
             {
                 _outgoingSplines.RemoveAll(item => item == spline);
@@ -275,9 +260,21 @@ public class Anchor : MonoBehaviour
     /// </summary>
     private void RemoveRenundantSplinesFromArrays()
     {
-        _outgoingSplines.RemoveAll(item => item == null);
-        _incomingSplines.RemoveAll(item => item == null);
-        _allSplines = null;
+        RemoveRenundantSplinesFor(_outgoingSplines);
+        RemoveRenundantSplinesFor(_incomingSplines);
+    }
+
+    private void RemoveRenundantSplinesFor(List<BezierSpline> list)
+    {
+        List<BezierSpline> splinesMap = new List<BezierSpline>();
+         
+        foreach(BezierSpline spline in list)
+        {
+            if (spline == null || splinesMap.Contains(spline))
+                list.Remove(spline);
+            else
+                splinesMap.Add(spline);
+        }
     }
 
     #endregion

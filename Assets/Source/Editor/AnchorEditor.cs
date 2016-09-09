@@ -8,6 +8,8 @@ public class AnchorEditor : Editor
     SerializedObject SerializedTargetAnchor;
     //SerializedProperty NextAnchorProperty;
 
+    private bool editorCalled = false;
+
     void OnEnable()
     {
         targetAnchor = (Anchor)target;
@@ -16,30 +18,32 @@ public class AnchorEditor : Editor
 
     private void OnSceneGUI()
     {
-        Anchor[] anchors = FindObjectsOfType(typeof(Anchor)) as Anchor[];
-
-        for (int i = 0; i < anchors.Length; i++)
+        if (editorCalled)
         {
-            Anchor anchor = anchors[i];
+            Anchor[] anchors = FindObjectsOfType(typeof(Anchor)) as Anchor[];
 
-            foreach(BezierSpline spline in anchor.OutgoingSplines.ToArray())
+            for (int i = 0; i < anchors.Length; i++)
             {
-                if(spline == null)
+                Anchor anchor = anchors[i];
+
+                foreach (BezierSpline spline in anchor.OutgoingSplines.ToArray())
                 {
-                    anchor.SyncAnchors();
-                    anchor.IncomingAnchors.ForEach(item => item.SyncAnchors());
-                    continue;
+                    //if (spline == null) continue;
+
+                    spline.SetControlPoints();
+                    DrawHandlesAndBezierSpline(spline);
                 }
 
-                spline.SetControlPoints();
-                DrawHandlesAndBezierSpline(spline);
+                foreach (Anchor outgoingAnchor in anchor.OutgoingAnchors)
+                {
+                    if (outgoingAnchor != null) Debug.DrawLine(anchor.transform.position, outgoingAnchor.transform.position, Color.cyan);
+                }
+
             }
-
-            //    foreach (Anchor anchor in _outgoingAnchors)
-            //    {
-            //        if(anchor!=null) Debug.DrawLine(this.transform.position, anchor.transform.position, Color.cyan);
-            //    }
-
+        }
+        else
+        {
+            editorCalled = true;
         }
 
     }
@@ -57,6 +61,7 @@ public class AnchorEditor : Editor
 
     private void DrawHandlesAndBezierSpline(BezierSpline spline)
     {
+        if (spline == null) return;
         Vector3 p0 = ShowPoint(0, spline);
 
         //Debug.Log(spline.ControlPointCount);
@@ -94,12 +99,6 @@ public class AnchorEditor : Editor
         {
             size *= 2f;
         }
-        //Handles.color = modeColors[(int)spline.GetControlPointMode(index)];
-        //if (Handles.Button(point, handleRotation, size * handleSize, size * pickSize, Handles.DotCap))
-        //{
-        //    selectedIndex = index;
-        //    Repaint();
-        //}
 
         EditorGUI.BeginChangeCheck();
         point = Handles.FreeMoveHandle(point, handleRotation, 10f, Vector3.zero, Handles.RectangleCap);

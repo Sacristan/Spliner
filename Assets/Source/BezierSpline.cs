@@ -135,7 +135,7 @@ public class BezierSpline : MonoBehaviour
 
     public void SetControlPoints() {
         if (Application.isPlaying || IsDirty) return;
-        Debug.DrawLine(StartPoint, EndPoint, Color.yellow);
+        Debug.DrawLine(StartPoint, EndPoint, Color.red);
 
         SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
         SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
