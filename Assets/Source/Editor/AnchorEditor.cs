@@ -53,8 +53,7 @@ public class AnchorEditor : Editor
 
         if (GUI.changed)
         {
-            //Debug.Log("GUI changed");
-            targetAnchor.SyncAnchors();
+            AnchorSyncer.Sync(targetAnchor);
         }
     }
 
