@@ -1,20 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(BezierSpline))]
+[RequireComponent(typeof(Spline))]
 public class SplineDecorator : MonoBehaviour
 {
-    private BezierSpline spline;
+    private Spline spline;
     public Transform knobTemplate;
 
     [SerializeField]
     private float distancePerKnob = 75f;
 
-    private BezierSpline Spline
+    private Spline Spline
     {
         get
         {
-            if (spline == null) spline = GetComponent<BezierSpline>();
+            if (spline == null) spline = GetComponent<Spline>();
             return spline;
         }
     }
@@ -23,7 +23,8 @@ public class SplineDecorator : MonoBehaviour
     {
         get
         {
-            return Spline.Length / distancePerKnob;
+            return 0f;
+            //return Spline.Length / distancePerKnob;
         }
     }
 
@@ -43,25 +44,26 @@ public class SplineDecorator : MonoBehaviour
         }
     }
 
+    //TODO: FIX ME
     public void GenerateKnobs()
     {
-        if (Application.isPlaying) return;
-        Cleanup();
+        //if (Application.isPlaying) return;
+        //Cleanup();
 
-        float stepSize = 1f / StepSize;
+        //float stepSize = 1f / StepSize;
 
-        for (int i = 1; i < PointsRequiredOnSpline-1; i++)
-        {
-            float stepNormalized = (i * stepSize);
+        //for (int i = 1; i < PointsRequiredOnSpline-1; i++)
+        //{
+        //    float stepNormalized = (i * stepSize);
 
-            Transform itemSpawned = Instantiate(knobTemplate) as Transform;
+        //    Transform itemSpawned = Instantiate(knobTemplate) as Transform;
 
-            Vector3 position = spline.GetPoint(stepNormalized);
+        //    Vector3 position = spline.GetPoint(stepNormalized);
 
-            itemSpawned.transform.localPosition = position;
-            itemSpawned.transform.SetParent(spline.DecoratorContainer);
-            itemSpawned.gameObject.name = "Knob"+i;
-        }
+        //    itemSpawned.transform.localPosition = position;
+        //    itemSpawned.transform.SetParent(spline.DecoratorContainer);
+        //    itemSpawned.gameObject.name = "Knob"+i;
+        //}
 
     }
 

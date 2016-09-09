@@ -23,7 +23,7 @@ public class AnchorEditor : Editor
             {
                 Anchor anchor = anchors[i];
 
-                foreach (BezierSpline spline in anchor.OutgoingSplines.ToArray())
+                foreach (Spline spline in anchor.OutgoingSplines.ToArray())
                 {
                     if (spline == null) continue;
 
@@ -56,7 +56,7 @@ public class AnchorEditor : Editor
         }
     }
 
-    private void DrawHandlesAndBezierSpline(BezierSpline spline)
+    private void DrawHandlesAndBezierSpline(Spline spline)
     {
         if (spline == null) return;
         Vector3 p0 = ShowPoint(0, spline);

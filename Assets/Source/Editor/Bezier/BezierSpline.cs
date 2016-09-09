@@ -12,57 +12,21 @@ public class BezierSpline : MonoBehaviour
 
     private bool loop;
 
-    [SerializeField]
-    private Transform decoratorContainer;
+    //TODO: FIX ME
+    private Anchor StartAnchor
+    {
+        get { return null; }
+    }
 
-    [SerializeField]
-    private Anchor _startAnchor;
-    [SerializeField]
-    private Anchor _endAnchor;
-
-    [SerializeField]
-    private SplineDecorator splineDecorator;
+    //TODO: FIX ME
+    private Anchor EndAnchor
+    {
+        get { return null; }
+    }
 
     public bool IsDirty
     {
         get { return StartAnchor == null || EndAnchor == null; }
-    }
-
-    public Knob[] Knobs
-    {
-        get { return DecoratorContainer.GetComponentsInChildren<Knob>(); }
-    }
-
-    public SplineDecorator SplineDecorator
-    {
-        get
-        {
-            if (splineDecorator == null) splineDecorator = GetComponent<SplineDecorator>();
-            return splineDecorator;
-        }
-    }
-
-    public Anchor StartAnchor
-    {
-        get { return _startAnchor; }
-    }
-
-    public Anchor EndAnchor
-    {
-        get { return _endAnchor; }
-    }
-
-    public Transform DecoratorContainer
-    {
-        get
-        {
-            if (decoratorContainer == null)
-            {
-                decoratorContainer = new GameObject("Decorators").transform;
-                decoratorContainer.SetParent(transform);
-            }
-            return decoratorContainer;
-        }
     }
 
     public Vector3 StartPoint
@@ -113,36 +77,12 @@ public class BezierSpline : MonoBehaviour
         }
     }
 
-    public static BezierSpline Create(Anchor startAnchor, Anchor endAnchor)
+    public void SetControlPoints()
     {
-        GameObject splineGO = Instantiate(AnchorManager.SplineTemplate.gameObject) as GameObject;
-        BezierSpline spline = splineGO.GetComponent<BezierSpline>();
-
-        spline._startAnchor = startAnchor;
-        spline._endAnchor = endAnchor;
-
-        spline.transform.SetParent(AnchorManager.SplineContainer.transform);
-        spline.gameObject.name = string.Format("Spline_{0}->{1}_{2}",spline.StartAnchor.gameObject.name, spline.EndAnchor.gameObject.name, System.Guid.NewGuid());
-
-        return spline;
-    }
-
-    public void Decorate()
-    {
-        SplineDecorator.GenerateKnobs();
-    }
-
-    public void SetControlPoints() {
-        if (Application.isPlaying || IsDirty) return;
         Debug.DrawLine(StartPoint, EndPoint, Color.red);
 
         SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
         SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
-    }
-
-    public void MarkForDestruction()
-    {
-        DestroyImmediate(gameObject);
     }
 
     public Vector3 GetControlPoint(int index)

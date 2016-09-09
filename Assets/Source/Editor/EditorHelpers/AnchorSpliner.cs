@@ -17,7 +17,7 @@ public class AnchorSpliner
     {
         Debug.Log("CleanupIncomingSplinesWithAnchor");
 
-        foreach (BezierSpline spline in targetAnchor.IncomingSplines.ToArray())
+        foreach (Spline spline in targetAnchor.IncomingSplines.ToArray())
         {
             if (spline == null) continue;
             if (spline.StartAnchor == anchorToRemove)
@@ -35,7 +35,7 @@ public class AnchorSpliner
     {
         Debug.Log("CleanupOutgoingSplinesWithAnchor");
 
-        foreach (BezierSpline spline in targetAnchor.OutgoingSplines.ToArray())
+        foreach (Spline spline in targetAnchor.OutgoingSplines.ToArray())
         {
             if (spline == null) continue;
             if (spline.EndAnchor == anchorToRemove)
@@ -51,7 +51,7 @@ public class AnchorSpliner
 
     public static void DecorateOutgoingSplines(Anchor anchor)
     {
-        foreach (BezierSpline spline in anchor.IncomingSplines)
+        foreach (Spline spline in anchor.IncomingSplines)
         {
             if (spline == null) continue;
             spline.Decorate();
