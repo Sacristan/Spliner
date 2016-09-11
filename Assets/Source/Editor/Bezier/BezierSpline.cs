@@ -1,9 +1,34 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
 
-public class BezierSpline : MonoBehaviour
+public class BezierSpline
 {
+    private Spline _spline;
+
+    public Spline Spline
+    {
+        get { return _spline; }
+    }
+
+    /// <summary>
+    /// Sets Spline ref, creates and places points
+    /// </summary>
+    /// <param name="spline"></param>
+    public BezierSpline(Spline spline)
+    {
+        _spline = spline;
+        Reset();
+
+        Vector3 startPos = Spline.transform.InverseTransformPoint(Spline.StartAnchor.transform.position);
+        Vector3 endPos = Spline.transform.InverseTransformPoint(Spline.EndAnchor.transform.position);
+
+        for(int i=0; i < 3; i++)
+        {
+            SetControlPoint(i, startPos);
+        }
+        SetControlPoint(3, endPos);
+    }
+
     [SerializeField]
     private Vector3[] points;
 
@@ -11,59 +36,6 @@ public class BezierSpline : MonoBehaviour
     private BezierControlPointMode[] modes;
 
     private bool loop;
-
-    [SerializeField]
-    private Transform decoratorContainer;
-
-    [SerializeField]
-    private Anchor _startAnchor;
-    [SerializeField]
-    private Anchor _endAnchor;
-
-    [SerializeField]
-    private SplineDecorator splineDecorator;
-
-    public bool IsDirty
-    {
-        get { return StartAnchor == null || EndAnchor == null; }
-    }
-
-    public Knob[] Knobs
-    {
-        get { return DecoratorContainer.GetComponentsInChildren<Knob>(); }
-    }
-
-    public SplineDecorator SplineDecorator
-    {
-        get
-        {
-            if (splineDecorator == null) splineDecorator = GetComponent<SplineDecorator>();
-            return splineDecorator;
-        }
-    }
-
-    public Anchor StartAnchor
-    {
-        get { return _startAnchor; }
-    }
-
-    public Anchor EndAnchor
-    {
-        get { return _endAnchor; }
-    }
-
-    public Transform DecoratorContainer
-    {
-        get
-        {
-            if (decoratorContainer == null)
-            {
-                decoratorContainer = new GameObject("Decorators").transform;
-                decoratorContainer.SetParent(transform);
-            }
-            return decoratorContainer;
-        }
-    }
 
     public Vector3 StartPoint
     {
@@ -113,41 +85,15 @@ public class BezierSpline : MonoBehaviour
         }
     }
 
-    public static BezierSpline Create(Anchor startAnchor, Anchor endAnchor)
-    {
-        GameObject splineGO = Instantiate(AnchorManager.SplineTemplate.gameObject) as GameObject;
-        BezierSpline spline = splineGO.GetComponent<BezierSpline>();
-
-        spline._startAnchor = startAnchor;
-        spline._endAnchor = endAnchor;
-
-        spline.transform.SetParent(AnchorManager.SplineContainer.transform);
-        spline.gameObject.name = string.Format("Spline_{0}->{1}_{2}",spline.StartAnchor.gameObject.name, spline.EndAnchor.gameObject.name, System.Guid.NewGuid());
-
-        return spline;
-    }
-
-    public void Decorate()
-    {
-        SplineDecorator.GenerateKnobs();
-    }
-
-    public void SetControlPoints() {
-        if (Application.isPlaying || IsDirty) return;
-        Debug.DrawLine(StartPoint, EndPoint, Color.red);
-
-        SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
-        SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
-    }
-
-    public void MarkForDestruction()
-    {
-        DestroyImmediate(gameObject);
-    }
-
     public Vector3 GetControlPoint(int index)
     {
         return points[index];
+    }
+
+    public void UpdateAnchorControlPoints()
+    {
+        UpdateFirstControlPointToFirstAnchor();
+        UpdateLastControlPointToLastAnchor();
     }
 
     public void SetControlPoint(int index, Vector3 point)
@@ -212,6 +158,16 @@ public class BezierSpline : MonoBehaviour
             }
         }
         EnforceMode(index);
+    }
+
+    private void UpdateFirstControlPointToFirstAnchor()
+    {
+        SetControlPoint(0, Spline.transform.InverseTransformPoint(Spline.StartAnchor.transform.position));
+    }
+
+    private void UpdateLastControlPointToLastAnchor()
+    {
+        SetControlPoint(points.Length - 1, Spline.transform.InverseTransformPoint(Spline.EndAnchor.transform.position));
     }
 
     private void EnforceMode(int index)
@@ -284,7 +240,7 @@ public class BezierSpline : MonoBehaviour
             t -= i;
             i *= 3;
         }
-        return transform.TransformPoint(Bezier.GetPoint(points[i], points[i + 1], points[i + 2], points[i + 3], t));
+        return Spline.transform.TransformPoint(Bezier.GetPoint(points[i], points[i + 1], points[i + 2], points[i + 3], t));
     }
 
     public Vector3 GetVelocity(float t)
@@ -302,7 +258,7 @@ public class BezierSpline : MonoBehaviour
             t -= i;
             i *= 3;
         }
-        return transform.TransformPoint(Bezier.GetFirstDerivative(points[i], points[i + 1], points[i + 2], points[i + 3], t)) - transform.position;
+        return Spline.transform.TransformPoint(Bezier.GetFirstDerivative(points[i], points[i + 1], points[i + 2], points[i + 3], t)) - Spline.transform.position;
     }
 
     public Vector3 GetDirection(float t)

@@ -13,11 +13,11 @@ public class AnchorKnobSyncer {
         }
     }
 
-    private static Knob[] FetchKnobs(List<BezierSpline> splines)
+    private static Knob[] FetchKnobs(List<Spline> splines)
     {
         List<Knob> knobsList = new List<Knob>();
 
-        foreach (BezierSpline spline in splines)
+        foreach (Spline spline in splines)
         {
             if (spline == null) continue;
             foreach (Knob knob in spline.SplineDecorator.Knobs)

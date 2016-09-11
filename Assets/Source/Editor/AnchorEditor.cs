@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(Anchor))]
 public class AnchorEditor : Editor
 {
-    Anchor targetAnchor;
+    private Anchor targetAnchor;
 
     private bool editorCalled = false;
+
+    private Dictionary<Spline, BezierSpline> splineCollection = new Dictionary<Spline, BezierSpline>();
 
     void OnEnable()
     {
@@ -23,11 +26,9 @@ public class AnchorEditor : Editor
             {
                 Anchor anchor = anchors[i];
 
-                foreach (BezierSpline spline in anchor.OutgoingSplines.ToArray())
+                foreach (Spline spline in anchor.OutgoingSplines.ToArray())
                 {
                     if (spline == null) continue;
-
-                    spline.SetControlPoints();
                     DrawHandlesAndBezierSpline(spline);
                 }
 
@@ -56,18 +57,31 @@ public class AnchorEditor : Editor
         }
     }
 
-    private void DrawHandlesAndBezierSpline(BezierSpline spline)
+    private void DrawHandlesAndBezierSpline(Spline spline)
     {
         if (spline == null) return;
-        Vector3 p0 = ShowPoint(0, spline);
 
-        //Debug.Log(spline.ControlPointCount);
+        BezierSpline bezierSpline;
 
-        for (int i = 1; i < spline.ControlPointCount; i += 3)
+        if (splineCollection.ContainsKey(spline))
         {
-            Vector3 p1 = ShowPoint(i, spline);
-            Vector3 p2 = ShowPoint(i + 1, spline);
-            Vector3 p3 = ShowPoint(i + 2, spline);
+            bezierSpline = splineCollection[spline];
+        }
+        else
+        {
+            bezierSpline = new BezierSpline(spline);
+            splineCollection.Add(spline, bezierSpline);
+        }
+
+        Vector3 p0 = ShowPoint(0, bezierSpline);
+
+        //Debug.Log(bezierSpline.ControlPointCount);
+
+        for (int i = 1; i < bezierSpline.ControlPointCount; i += 3)
+        {
+            Vector3 p1 = ShowPoint(i, bezierSpline);
+            Vector3 p2 = ShowPoint(i + 1, bezierSpline);
+            Vector3 p3 = ShowPoint(i + 2, bezierSpline);
 
             Color prevColor = Handles.color;
 
@@ -79,31 +93,36 @@ public class AnchorEditor : Editor
 
             Handles.DrawBezier(p0, p3, p1, p2, Color.green, null, 2f);
 
+            //Debug.Log(string.Format("Points: {0} {1} {2} {3}",p0,p1,p2,p3));
+
             p0 = p3;
         }
-        spline.Decorate();
+
+        bezierSpline.UpdateAnchorControlPoints();
     }
 
     private Vector3 ShowPoint(int index, BezierSpline spline)
     {
-        Transform handleTransform = spline.transform;
+        Transform handleTransform = spline.Spline.transform;
         Quaternion handleRotation = Tools.pivotRotation == PivotRotation.Local ?
             handleTransform.rotation : Quaternion.identity;
 
         Vector3 point = handleTransform.TransformPoint(spline.GetControlPoint(index));
         float size = HandleUtility.GetHandleSize(point);
+
         if (index == 0)
-        {
             size *= 2f;
-        }
 
         EditorGUI.BeginChangeCheck();
+
+        Handles.CubeCap(22, point, Quaternion.identity, 5f);
+
         point = Handles.FreeMoveHandle(point, handleRotation, 10f, Vector3.zero, Handles.RectangleCap);
 
         if (EditorGUI.EndChangeCheck())
         {
-            Undo.RecordObject(spline, "Move Point");
-            EditorUtility.SetDirty(spline);
+            //Undo.RecordObject(spline, "Move Point");
+            //EditorUtility.SetDirty(spline);
             spline.SetControlPoint(index, handleTransform.InverseTransformPoint(point));
         }
         return point;

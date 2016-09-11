@@ -11,7 +11,7 @@ public class AnchorManager : MonoBehaviour
     private Transform _splineContainer;
 
     [SerializeField]
-    private BezierSpline splineTemplate;
+    private Spline splineTemplate;
 
     private static AnchorManager Singletone
     {

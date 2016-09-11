@@ -17,7 +17,7 @@ public class AnchorSpliner
     {
         Debug.Log("CleanupIncomingSplinesWithAnchor");
 
-        foreach (BezierSpline spline in targetAnchor.IncomingSplines.ToArray())
+        foreach (Spline spline in targetAnchor.IncomingSplines.ToArray())
         {
             if (spline == null) continue;
             if (spline.StartAnchor == anchorToRemove)
@@ -35,7 +35,7 @@ public class AnchorSpliner
     {
         Debug.Log("CleanupOutgoingSplinesWithAnchor");
 
-        foreach (BezierSpline spline in targetAnchor.OutgoingSplines.ToArray())
+        foreach (Spline spline in targetAnchor.OutgoingSplines.ToArray())
         {
             if (spline == null) continue;
             if (spline.EndAnchor == anchorToRemove)
@@ -51,7 +51,7 @@ public class AnchorSpliner
 
     public static void DecorateOutgoingSplines(Anchor anchor)
     {
-        foreach (BezierSpline spline in anchor.IncomingSplines)
+        foreach (Spline spline in anchor.IncomingSplines)
         {
             if (spline == null) continue;
             spline.Decorate();
@@ -68,7 +68,7 @@ public class AnchorSpliner
 
     private static void AddSpline(Anchor fromAnchor, Anchor toAnchor)
     {
-        BezierSpline spline = BezierSpline.Create(fromAnchor, toAnchor);
+        Spline spline = Spline.Create(fromAnchor, toAnchor);
         toAnchor.IncomingSplines.Add(spline);
         fromAnchor.OutgoingSplines.Add(spline);
 
@@ -77,11 +77,11 @@ public class AnchorSpliner
     }
 
 
-    private static void RemoveRenundantSplinesFor(List<BezierSpline> list)
+    private static void RemoveRenundantSplinesFor(List<Spline> list)
     {
-        List<BezierSpline> splinesMap = new List<BezierSpline>();
+        List<Spline> splinesMap = new List<Spline>();
 
-        foreach (BezierSpline spline in list.ToArray())
+        foreach (Spline spline in list.ToArray())
         {
             if (spline == null || splinesMap.Contains(spline))
                 list.Remove(spline);

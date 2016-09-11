@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Knob : MonoBehaviour
 {
-    public BezierSpline Spline
+    public Spline Spline
     {
         get
         {
