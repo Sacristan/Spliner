@@ -37,7 +37,6 @@ public class AnchorEditor : Editor
                     if (outgoingAnchor != null) Debug.DrawLine(anchor.transform.position, outgoingAnchor.transform.position, Color.cyan);
                 }
 
-                AnchorKnobSyncer.RepopulateKnobs(anchor);
             }
         }
         else
@@ -99,6 +98,7 @@ public class AnchorEditor : Editor
         }
 
         bezierSpline.UpdateAnchorControlPoints();
+        SplineDecorator.Decorate(bezierSpline);
     }
 
     private Vector3 ShowPoint(int index, BezierSpline spline)
@@ -127,7 +127,5 @@ public class AnchorEditor : Editor
         }
         return point;
     }
-
-
 
 }
