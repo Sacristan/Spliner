@@ -10,10 +10,23 @@ public class BezierSpline
         get { return _spline; }
     }
 
+    /// <summary>
+    /// Sets Spline ref, creates and places points
+    /// </summary>
+    /// <param name="spline"></param>
     public BezierSpline(Spline spline)
     {
         _spline = spline;
-        //TODO: calculate points here
+        Reset();
+
+        Vector3 startPos = Spline.transform.InverseTransformPoint(Spline.StartAnchor.transform.position);
+        Vector3 endPos = Spline.transform.InverseTransformPoint(Spline.EndAnchor.transform.position);
+
+        for(int i=0; i < 3; i++)
+        {
+            SetControlPoint(i, startPos);
+        }
+        SetControlPoint(3, endPos);
     }
 
     [SerializeField]
@@ -72,17 +85,15 @@ public class BezierSpline
         }
     }
 
-    //public void SetControlPoints()
-    //{
-    //    Debug.DrawLine(StartPoint, EndPoint, Color.red);
-
-    //    SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
-    //    SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
-    //}
-
     public Vector3 GetControlPoint(int index)
     {
         return points[index];
+    }
+
+    public void UpdateAnchorControlPoints()
+    {
+        UpdateFirstControlPointToFirstAnchor();
+        UpdateLastControlPointToLastAnchor();
     }
 
     public void SetControlPoint(int index, Vector3 point)
@@ -147,6 +158,16 @@ public class BezierSpline
             }
         }
         EnforceMode(index);
+    }
+
+    private void UpdateFirstControlPointToFirstAnchor()
+    {
+        SetControlPoint(0, Spline.transform.InverseTransformPoint(Spline.StartAnchor.transform.position));
+    }
+
+    private void UpdateLastControlPointToLastAnchor()
+    {
+        SetControlPoint(points.Length - 1, Spline.transform.InverseTransformPoint(Spline.EndAnchor.transform.position));
     }
 
     private void EnforceMode(int index)

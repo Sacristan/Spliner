@@ -75,5 +75,4 @@ public class Spline : MonoBehaviour
         return spline;
     }
 
-
 }

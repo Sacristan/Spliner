@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(Anchor))]
 public class AnchorEditor : Editor
 {
-    Anchor targetAnchor;
+    private Anchor targetAnchor;
 
     private bool editorCalled = false;
+
+    [SerializeField]
+    private Dictionary<Spline, BezierSpline> splineCollection = new Dictionary<Spline, BezierSpline>();
 
     void OnEnable()
     {
@@ -58,11 +62,21 @@ public class AnchorEditor : Editor
     {
         if (spline == null) return;
 
-        BezierSpline bezierSpline = new BezierSpline(spline);
+        BezierSpline bezierSpline;
+
+        if (splineCollection.ContainsKey(spline))
+        {
+            bezierSpline = splineCollection[spline];
+        }
+        else
+        {
+            bezierSpline = new BezierSpline(spline);
+            splineCollection.Add(spline, bezierSpline);
+        }
 
         Vector3 p0 = ShowPoint(0, bezierSpline);
 
-        //Debug.Log(spline.ControlPointCount);
+        //Debug.Log(bezierSpline.ControlPointCount);
 
         for (int i = 1; i < bezierSpline.ControlPointCount; i += 3)
         {
@@ -80,19 +94,12 @@ public class AnchorEditor : Editor
 
             Handles.DrawBezier(p0, p3, p1, p2, Color.green, null, 2f);
 
+            //Debug.Log(string.Format("Points: {0} {1} {2} {3}",p0,p1,p2,p3));
+
             p0 = p3;
         }
 
-        //TODO: FIXME
-        //spline.Decorate();
-
-        //public void SetControlPoints()
-        //{
-        //    Debug.DrawLine(StartPoint, EndPoint, Color.red);
-
-        //    SetControlPoint(0, transform.InverseTransformPoint(StartAnchor.transform.position));
-        //    SetControlPoint(points.Length - 1, transform.InverseTransformPoint(EndAnchor.transform.position));
-        //}
+        bezierSpline.UpdateAnchorControlPoints();
     }
 
     private Vector3 ShowPoint(int index, BezierSpline spline)
@@ -103,12 +110,14 @@ public class AnchorEditor : Editor
 
         Vector3 point = handleTransform.TransformPoint(spline.GetControlPoint(index));
         float size = HandleUtility.GetHandleSize(point);
+
         if (index == 0)
-        {
             size *= 2f;
-        }
 
         EditorGUI.BeginChangeCheck();
+
+        Handles.CubeCap(22, point, Quaternion.identity, 5f);
+
         point = Handles.FreeMoveHandle(point, handleRotation, 10f, Vector3.zero, Handles.RectangleCap);
 
         if (EditorGUI.EndChangeCheck())
