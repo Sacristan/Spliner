@@ -26,7 +26,7 @@ public class SplineDecorator
 
         float stepSizeF = 1f / stepSize;
 
-        for (int i = 1; i < pointsRequiredOnSpline - 1; i++)
+        for (int i = 2; i < pointsRequiredOnSpline; i++)
         {
             float stepNormalized = (i * stepSizeF);
 
@@ -37,6 +37,8 @@ public class SplineDecorator
             itemSpawned.transform.localPosition = position;
             itemSpawned.transform.SetParent(DecoratorContainer(bezierSpline.Spline));
             itemSpawned.name = "Knob" + i;
+            Knob knob = itemSpawned.GetComponent<Knob>();
+            knob.Spline = bezierSpline.Spline;
         }
     }
 
