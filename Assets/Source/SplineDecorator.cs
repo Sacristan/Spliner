@@ -47,24 +47,22 @@ public class SplineDecorator : MonoBehaviour
     //TODO: FIX ME
     public void GenerateKnobs()
     {
-        //if (Application.isPlaying) return;
         //Cleanup();
 
         //float stepSize = 1f / StepSize;
 
-        //for (int i = 1; i < PointsRequiredOnSpline-1; i++)
+        //for (int i = 1; i < PointsRequiredOnSpline - 1; i++)
         //{
         //    float stepNormalized = (i * stepSize);
 
         //    Transform itemSpawned = Instantiate(knobTemplate) as Transform;
 
-        //    Vector3 position = spline.GetPoint(stepNormalized);
+        //    Vector3 position = spline.Spline.GetPoint(stepNormalized);
 
         //    itemSpawned.transform.localPosition = position;
         //    itemSpawned.transform.SetParent(spline.DecoratorContainer);
-        //    itemSpawned.gameObject.name = "Knob"+i;
+        //    itemSpawned.gameObject.name = "Knob" + i;
         //}
-
     }
 
     private void Cleanup()

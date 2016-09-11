@@ -9,7 +9,6 @@ public class AnchorEditor : Editor
 
     private bool editorCalled = false;
 
-    [SerializeField]
     private Dictionary<Spline, BezierSpline> splineCollection = new Dictionary<Spline, BezierSpline>();
 
     void OnEnable()
