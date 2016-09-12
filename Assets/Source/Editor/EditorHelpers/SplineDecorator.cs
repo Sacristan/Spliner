@@ -5,7 +5,10 @@ namespace BeetrootLab.Features
 {
     public class SplineDecorator
     {
-
+        /// <summary>
+        /// Cleans up knobs, generates and assigns them to spline. Accepts only bezier splines
+        /// </summary>
+        /// <param name="bezierSpline"></param>
         public static void Decorate(BezierSpline bezierSpline)
         {
             if (bezierSpline == null || bezierSpline.Spline == null) return;
@@ -14,12 +17,20 @@ namespace BeetrootLab.Features
             FetchKnobsForSpline(bezierSpline.Spline);
         }
 
+        /// <summary>
+        /// Destroys all Spline knobs
+        /// </summary>
+        /// <param name="bezierSpline"></param>
         private static void Cleanup(BezierSpline bezierSpline)
         {
             foreach (Knob knob in bezierSpline.Spline.Knobs)
                 Object.DestroyImmediate(knob.gameObject);
         }
 
+        /// <summary>
+        /// Creates knobs for spline
+        /// </summary>
+        /// <param name="bezierSpline"></param>
         private static void GenerateKnobs(BezierSpline bezierSpline)
         {
             float stepSize = bezierSpline.Length / DistancePerKnob;
@@ -47,6 +58,11 @@ namespace BeetrootLab.Features
             }
         }
 
+        /// <summary>
+        /// Gets (and creates if required) decorator container object for spline
+        /// </summary>
+        /// <param name="spline"></param>
+        /// <returns></returns>
         private static Transform DecoratorContainer(Spline spline)
         {
             Transform splineDecorators = spline.transform.Find("SplineDecorators");
@@ -60,11 +76,6 @@ namespace BeetrootLab.Features
             return splineDecorators;
         }
 
-        private static float DistancePerKnob
-        {
-            get { return 0.75f; }
-        }
-
         private static SplineMap SplineMap
         {
             get { return GameObject.FindObjectOfType<SplineMap>(); }
@@ -74,6 +85,11 @@ namespace BeetrootLab.Features
         {
             Knob[] knobs = DecoratorContainer(spline).GetComponentsInChildren<Knob>();
             spline.Knobs = knobs;
+        }
+
+        private static float DistancePerKnob
+        {
+            get { return 0.75f; }
         }
 
     }

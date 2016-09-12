@@ -13,7 +13,7 @@ namespace BeetrootLab.Features
         }
 
         /// <summary>
-        /// Sets Spline ref, creates and places points
+        /// Sets Spline ref, creates and places points if required
         /// </summary>
         /// <param name="spline"></param>
         public BezierSpline(Spline spline)
@@ -46,8 +46,7 @@ namespace BeetrootLab.Features
             UpdateAnchorControlPoints();
         }
 
-        private bool loop;
-
+        #region Properties
         public Vector3 StartPoint
         {
             get { return GetPoint(0f); }
@@ -91,17 +90,40 @@ namespace BeetrootLab.Features
             };
             }
         }
+
+        public int CurveCount
+        {
+            get
+            {
+                return (Points.Length - 1) / 3;
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Gets point by passed info
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public Vector3 GetControlPoint(int index)
         {
             return Points[index];
         }
 
+        /// <summary>
+        /// Updates first and Last point whose are considered Anchor points
+        /// </summary>
         public void UpdateAnchorControlPoints()
         {
             SetControlPoint(0, Spline.transform.InverseTransformPoint(Spline.StartAnchor.transform.position));
             SetControlPoint(Points.Length - 1, Spline.transform.InverseTransformPoint(Spline.EndAnchor.transform.position));
         }
 
+        /// <summary>
+        /// Sets point (must InverseTransformPoint already) at index. Supports 0..3 indexes
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="point"></param>
         public void SetControlPoint(int index, Vector3 point)
         {
             switch (index)
@@ -122,14 +144,11 @@ namespace BeetrootLab.Features
 
         }
 
-        public int CurveCount
-        {
-            get
-            {
-                return (Points.Length - 1) / 3;
-            }
-        }
-
+        /// <summary>
+        /// Gets a Vector3 at a certain length along Spline path
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public Vector3 GetPoint(float t)
         {
             int i;
@@ -148,6 +167,11 @@ namespace BeetrootLab.Features
             return Spline.transform.TransformPoint(Bezier.GetPoint(Points[i], Points[i + 1], Points[i + 2], Points[i + 3], t));
         }
 
+        /// <summary>
+        /// Gets velocity at a certain length along Spline path 
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public Vector3 GetVelocity(float t)
         {
             int i;
@@ -166,6 +190,11 @@ namespace BeetrootLab.Features
             return Spline.transform.TransformPoint(Bezier.GetFirstDerivative(Points[i], Points[i + 1], Points[i + 2], Points[i + 3], t)) - Spline.transform.position;
         }
 
+        /// <summary>
+        /// Gets Normal's at a certain length along Spline path  
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public Vector3 GetDirection(float t)
         {
             return GetVelocity(t).normalized;

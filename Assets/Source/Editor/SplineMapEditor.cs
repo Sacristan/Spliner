@@ -29,11 +29,12 @@ namespace BeetrootLab.Features
             }
         }
 
+        /// <summary>
+        /// Creates a new anchor object
+        /// </summary>
         private void AddAnchor()
         {
-            Anchor[] anchors = GameObject.FindObjectsOfType<Anchor>();
-
-            GameObject anchorGo = new GameObject("Anchor" + anchors.Length, typeof(Anchor));
+            GameObject anchorGo = new GameObject("anchor", typeof(Anchor));
             Anchor anchor = anchorGo.GetComponent<Anchor>();
             AnchorSyncer.Sync(anchor);
 

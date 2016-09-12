@@ -6,16 +6,31 @@ namespace BeetrootLab.Features
 
     public class AnchorSpliner
     {
+        /// <summary>
+        /// Adds anchorToAdd to targetAnchor as Incoming Anchor
+        /// </summary>
+        /// <param name="targetAnchor"></param>
+        /// <param name="anchorToAdd"></param>
         public static void AddIncomingSpline(Anchor targetAnchor, Anchor anchorToAdd)
         {
             AddSpline(anchorToAdd, targetAnchor);
         }
 
+        /// <summary>
+        /// Adds anchorToAdd to targetAnchor as Outgoing Anchor.
+        /// </summary>
+        /// <param name="targetAnchor"></param>
+        /// <param name="anchorToAdd"></param>
         public static void AddOutgoingSpline(Anchor targetAnchor, Anchor anchorToAdd)
         {
             AddSpline(targetAnchor, anchorToAdd);
         }
 
+        /// <summary>
+        /// Removes anchorToRemove splines from targetAnchor Incoming anchors
+        /// </summary>
+        /// <param name="targetAnchor"></param>
+        /// <param name="anchorToRemove"></param>
         public static void CleanupIncomingSplinesWithAnchor(Anchor targetAnchor, Anchor anchorToRemove)
         {
             //Debug.Log("CleanupIncomingSplinesWithAnchor");
@@ -35,6 +50,11 @@ namespace BeetrootLab.Features
             CleanupSplines(targetAnchor);
         }
 
+        /// <summary>
+        /// Removes anchorToRemove splines from targetAnchor Outgoing anchors
+        /// </summary>
+        /// <param name="targetAnchor"></param>
+        /// <param name="anchorToRemove"></param>
         public static void CleanupOutgoingSplinesWithAnchor(Anchor targetAnchor, Anchor anchorToRemove)
         {
             //Debug.Log("CleanupOutgoingSplinesWithAnchor");
@@ -53,14 +73,23 @@ namespace BeetrootLab.Features
             CleanupSplines(targetAnchor);
         }
 
+        /// <summary>
+        /// Removes Redundant spline for anchors incoming and outgoing splines 
+        /// </summary>
+        /// <param name="anchor"></param>
         public static void CleanupSplines(Anchor anchor)
         {
-            RemoveRenundantSplinesFor(anchor.OutgoingSplines);
-            RemoveRenundantSplinesFor(anchor.IncomingSplines);
+            RemoveRedundantSplinesFor(anchor.OutgoingSplines);
+            RemoveRedundantSplinesFor(anchor.IncomingSplines);
         }
 
         #region Private Methods
 
+        /// <summary>
+        /// Adds and Connects Spline fromAnchor -> toAnchor
+        /// </summary>
+        /// <param name="fromAnchor"></param>
+        /// <param name="toAnchor"></param>
         private static void AddSpline(Anchor fromAnchor, Anchor toAnchor)
         {
             Spline spline = CreateSpline(fromAnchor, toAnchor);
@@ -71,6 +100,12 @@ namespace BeetrootLab.Features
             CleanupSplines(fromAnchor);
         }
 
+        /// <summary>
+        /// Creates spline fromAnchor -> toAnchor
+        /// </summary>
+        /// <param name="startAnchor"></param>
+        /// <param name="endAnchor"></param>
+        /// <returns></returns>
         private static Spline CreateSpline(Anchor startAnchor, Anchor endAnchor)
         {
             string splineGOName = string.Format("Spline_{0}->{1}_{2}", startAnchor.gameObject.name, endAnchor.gameObject.name, System.Guid.NewGuid());
@@ -88,7 +123,11 @@ namespace BeetrootLab.Features
             return spline;
         }
 
-        private static void RemoveRenundantSplinesFor(List<Spline> list)
+        /// <summary>
+        /// Removes nulls and duplicate values in List
+        /// </summary>
+        /// <param name="list"></param>
+        private static void RemoveRedundantSplinesFor(List<Spline> list)
         {
             List<Spline> splinesMap = new List<Spline>();
 

@@ -59,6 +59,10 @@ namespace BeetrootLab.Features
             }
         }
 
+        /// <summary>
+        /// Draw handles and bezier spline for Passed spline object
+        /// </summary>
+        /// <param name="spline"></param>
         private void DrawHandlesAndBezierSpline(Spline spline)
         {
             if (spline == null) return;
@@ -87,6 +91,12 @@ namespace BeetrootLab.Features
             SplineDecorator.Decorate(bezierSpline);
         }
 
+        /// <summary>
+        ///  Shows Spline point at index 
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="spline"></param>
+        /// <returns></returns>
         private Vector3 ShowPoint(int index, BezierSpline spline)
         {
             Transform handleTransform = spline.Spline.transform;

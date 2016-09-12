@@ -4,6 +4,10 @@ namespace BeetrootLab.Features
 {
     public class AnchorSyncer
     {
+        /// <summary>
+        /// Synchronises this anchor to incoming and outcoming anchors
+        /// </summary>
+        /// <param name="targetAnchor"></param>
         public static void Sync(Anchor targetAnchor)
         {
             foreach (Anchor anchor in targetAnchor.IncomingAnchors)
@@ -22,12 +26,16 @@ namespace BeetrootLab.Features
 
         #region Private Methods
 
+        /// <summary>
+        /// Adds toAnchor to fromAnchor as incoming if required
+        /// </summary>
+        /// <param name="toAnchor"></param>
+        /// <param name="fromAnchor"></param>
         private static void SyncIncomingAnchor(Anchor toAnchor, Anchor fromAnchor)
         {
             if (toAnchor == fromAnchor)
             {
                 toAnchor.IncomingAnchors.RemoveAll(item => item == fromAnchor);
-                AnchorSpliner.AddOutgoingSpline(toAnchor, fromAnchor);
             }
             else
             {
@@ -39,12 +47,16 @@ namespace BeetrootLab.Features
             }
         }
 
+        /// <summary>
+        /// Adds toAnchor to fromAnchor as outgoing if required
+        /// </summary>
+        /// <param name="toAnchor"></param>
+        /// <param name="fromAnchor"></param>
         public static void SyncOutgoingAnchor(Anchor toAnchor, Anchor fromAnchor)
         {
             if (toAnchor == fromAnchor)
             {
                 toAnchor.OutgoingAnchors.RemoveAll(item => item == fromAnchor);
-                AnchorSpliner.AddIncomingSpline(toAnchor, fromAnchor);
             }
             else
             {
@@ -56,6 +68,10 @@ namespace BeetrootLab.Features
             }
         }
 
+        /// <summary>
+        /// General syncronization and cleanup of anchors 
+        /// </summary>
+        /// <param name="targetAnchor"></param>
         private static void SyncAndCleanupAnchors(Anchor targetAnchor)
         {
             Anchor[] anchors = GameObject.FindObjectsOfType<Anchor>();

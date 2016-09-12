@@ -44,6 +44,10 @@ namespace BeetrootLab.Features
             }
         }
 
+        /// <summary>
+        /// This determines if player is pressing anchor visualiser
+        /// </summary>
+        /// <returns></returns>
         private bool CanAssignMaterial()
         {
             bool result = false;
@@ -74,6 +78,9 @@ namespace BeetrootLab.Features
             return result;
         }
 
+        /// <summary>
+        /// Assigns material depending on current AnchorVisualiserStatus
+        /// </summary>
         private void AssignMaterial()
         {
             switch (anchorStatus)
