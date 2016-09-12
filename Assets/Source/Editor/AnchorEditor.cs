@@ -48,8 +48,9 @@ public class AnchorEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        if (Application.isPlaying) return;
         DrawDefaultInspector();
+
+        if (Application.isPlaying) return;
 
         if (GUI.changed)
         {

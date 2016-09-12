@@ -56,7 +56,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: ec405e0c4f75c994eac6b94a7da61221, type: 2}
+  - {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
@@ -89,7 +89,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Convex: 0
+  m_Convex: 1
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!114 &114000010148846178
 MonoBehaviour:
@@ -102,9 +102,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2d302ce1d6d1834f940c762ccfdff41, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _incomingKnobs: []
-  _outgoingKnobs: []
   _outgoingSplines: []
   _incomingSplines: []
   _outgoingAnchors: []
   _incomingAnchors: []
+  anchorStatus: 0

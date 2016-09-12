@@ -19,8 +19,8 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 4000012392430660}
-  - 33: {fileID: 33000012864885992}
   - 65: {fileID: 65000010663801442}
+  - 33: {fileID: 33000012864885992}
   - 23: {fileID: 23000010502480654}
   - 114: {fileID: 114000010910727624}
   m_Layer: 0
@@ -38,7 +38,7 @@ Transform:
   m_GameObject: {fileID: 1000013038989498}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1196.5798, y: 354.33167, z: 0.99288535}
-  m_LocalScale: {x: 0.1, y: 0.045, z: 0.1}
+  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
@@ -56,7 +56,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 83ee1a4c0a2a56f47a9ef3dc71dfdab7, type: 2}
+  - {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
@@ -78,7 +78,7 @@ MeshFilter:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000013038989498}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!65 &65000010663801442
 BoxCollider:
   m_ObjectHideFlags: 1
