@@ -135,6 +135,10 @@ MonoBehaviour:
     type: 2}
   _knobVisualisation: {fileID: 1000013038989498, guid: eb0aba4627385f04f92fed2e81e2b6ab,
     type: 2}
+  _anchorLockedMaterial: {fileID: 2100000, guid: 9f3ff9102b398574eb85c28e6b06f69f,
+    type: 2}
+  _anchorAvailableMaterial: {fileID: 2100000, guid: 47763e9fb44f2014da68f0dc9939b725,
+    type: 2}
 --- !u!1 &709735610
 GameObject:
   m_ObjectHideFlags: 0
