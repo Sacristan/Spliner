@@ -4,12 +4,6 @@ using System.Collections.Generic;
 public class Anchor : MonoBehaviour
 {
     [SerializeField]
-    private Knob[] _incomingKnobs;
-
-    [SerializeField]
-    private Knob[] _outgoingKnobs;
-
-    [SerializeField]
     private List<Spline> _outgoingSplines = new List<Spline>();
 
     [SerializeField]
@@ -45,18 +39,6 @@ public class Anchor : MonoBehaviour
     {
         get { return _outgoingSplines; }
         set { _outgoingSplines = value; }
-    }
-
-    public Knob[] OutgoingKnobs
-    {
-        get { return _outgoingKnobs; }
-        set { _outgoingKnobs = value; }
-    }
-
-    public Knob[] IncomingKnobs
-    {
-        get { return _incomingKnobs; }
-        set { _incomingKnobs = value; }
     }
 
     #endregion

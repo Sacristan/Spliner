@@ -18,6 +18,12 @@ public class BezierSpline
     {
         _spline = spline;
 
+        if(spline.StartAnchor ==null|| spline.EndAnchor == null)
+        {
+            UnityEngine.Object.DestroyImmediate(spline.gameObject);
+            return;
+        }
+
         Vector3 startPos = Spline.transform.InverseTransformPoint(Spline.StartAnchor.transform.position);
         Vector3 endPos = Spline.transform.InverseTransformPoint(Spline.EndAnchor.transform.position);
 

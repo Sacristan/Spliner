@@ -7,7 +7,6 @@ public class SplineDecorator
     public static void Decorate(BezierSpline bezierSpline)
     {
         if (bezierSpline == null || bezierSpline.Spline == null) return;
-
         Cleanup(bezierSpline);
         GenerateKnobs(bezierSpline);
         FetchKnobsForSpline(bezierSpline.Spline);
@@ -15,7 +14,6 @@ public class SplineDecorator
 
     private static void Cleanup(BezierSpline bezierSpline)
     {
-        if (bezierSpline == null || bezierSpline.Spline == null) return;
         foreach (Knob knob in bezierSpline.Spline.Knobs)
             Object.DestroyImmediate(knob.gameObject);
     }
@@ -60,7 +58,7 @@ public class SplineDecorator
 
     private static float DistancePerKnob
     {
-        get { return 45f; }
+        get { return 0.75f; }
     }
 
     private static void FetchKnobsForSpline(Spline spline)
