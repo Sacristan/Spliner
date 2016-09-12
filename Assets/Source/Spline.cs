@@ -13,7 +13,7 @@ public class Spline : MonoBehaviour
     private Vector3 _p3;
 
     [SerializeField]
-    private Knob[] _knobs;
+    private Knob[] _knobs = new Knob[0];
 
     [SerializeField]
     private Anchor _startAnchor;

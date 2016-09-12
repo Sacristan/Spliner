@@ -19,8 +19,21 @@ public class BezierSpline
         _spline = spline;
 
         Vector3 startPos = Spline.transform.InverseTransformPoint(Spline.StartAnchor.transform.position);
-        if (Spline.P1 == Vector3.zero) SetControlPoint(1, startPos);
-        if (Spline.P2 == Vector3.zero) SetControlPoint(2, startPos);
+        Vector3 endPos = Spline.transform.InverseTransformPoint(Spline.EndAnchor.transform.position);
+
+        Vector3 diff = endPos - startPos;
+
+        if (Spline.P1 == Vector3.zero)
+        {
+            Vector3 calculatedP1 = startPos + diff * 0.45f + Vector3.up;
+            SetControlPoint(1, calculatedP1);
+        }
+
+        if (Spline.P2 == Vector3.zero)
+        {
+            Vector3 calculatedP2 = startPos + diff * 0.87f + Vector3.up;
+            SetControlPoint(2, calculatedP2);
+        }
 
         UpdateAnchorControlPoints();
     }

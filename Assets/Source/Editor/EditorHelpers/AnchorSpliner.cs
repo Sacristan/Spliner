@@ -15,7 +15,7 @@ public class AnchorSpliner
 
     public static void CleanupIncomingSplinesWithAnchor(Anchor targetAnchor, Anchor anchorToRemove)
     {
-        Debug.Log("CleanupIncomingSplinesWithAnchor");
+        //Debug.Log("CleanupIncomingSplinesWithAnchor");
 
         foreach (Spline spline in targetAnchor.IncomingSplines.ToArray())
         {
@@ -34,7 +34,7 @@ public class AnchorSpliner
 
     public static void CleanupOutgoingSplinesWithAnchor(Anchor targetAnchor, Anchor anchorToRemove)
     {
-        Debug.Log("CleanupOutgoingSplinesWithAnchor");
+        //Debug.Log("CleanupOutgoingSplinesWithAnchor");
 
         foreach (Spline spline in targetAnchor.OutgoingSplines.ToArray())
         {

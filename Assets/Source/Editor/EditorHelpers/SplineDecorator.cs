@@ -15,6 +15,7 @@ public class SplineDecorator
 
     private static void Cleanup(BezierSpline bezierSpline)
     {
+        if (bezierSpline == null || bezierSpline.Spline == null) return;
         foreach (Knob knob in bezierSpline.Spline.Knobs)
             Object.DestroyImmediate(knob.gameObject);
     }
@@ -28,7 +29,7 @@ public class SplineDecorator
 
         float stepSizeF = 1f / stepSize;
 
-        for (int i = 2; i < pointsRequiredOnSpline; i++)
+        for (int i = 1 ; i < pointsRequiredOnSpline-1; i++)
         {
             float stepNormalized = (i * stepSizeF);
 
@@ -59,7 +60,7 @@ public class SplineDecorator
 
     private static float DistancePerKnob
     {
-        get { return 75f; }
+        get { return 45f; }
     }
 
     private static void FetchKnobsForSpline(Spline spline)

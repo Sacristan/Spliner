@@ -17,6 +17,7 @@ public class AnchorEditor : Editor
 
     private void OnSceneGUI()
     {
+        if (Application.isPlaying) return;
         if (editorCalled)
         {
             Anchor[] anchors = FindObjectsOfType(typeof(Anchor)) as Anchor[];
@@ -47,7 +48,7 @@ public class AnchorEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        if (!editorCalled) return;
+        if (Application.isPlaying) return;
         DrawDefaultInspector();
 
         if (GUI.changed)
@@ -79,10 +80,6 @@ public class AnchorEditor : Editor
             Handles.color = prevColor;
 
             Handles.DrawBezier(p0, p3, p1, p2, Color.green, null, 2f);
-
-            //Debug.Log(string.Format("Points: {0} {1} {2} {3} / Spline: {4} {5} {6} {7}", p0, p1, p2, p3, spline.P0, spline.P1, spline.P2, spline.P3));
-
-            //p0 = p3;
         }
 
         SplineDecorator.Decorate(bezierSpline);
@@ -102,7 +99,13 @@ public class AnchorEditor : Editor
 
         EditorGUI.BeginChangeCheck();
 
+        Color prevColor = Handles.color;
+
+        if(index > 0 && index < 3)
+            Handles.color = Color.magenta;
+
         point = Handles.FreeMoveHandle(point, handleRotation, 10f, Vector3.zero, Handles.RectangleCap);
+        Handles.color = prevColor;
 
         if (EditorGUI.EndChangeCheck())
         {
