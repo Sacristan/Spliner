@@ -4,7 +4,7 @@ using System;
 
 public class Anchor : MonoBehaviour
 {
-    private enum AnchorStatus { Locked=0, Available=1, Selected=2 };
+    private enum AnchorStatus { Locked=0, Available=1 };
 
     [SerializeField]
     private List<Spline> _outgoingSplines = new List<Spline>();
@@ -62,16 +62,22 @@ public class Anchor : MonoBehaviour
     {
         if (CanAssignMaterial())
         {
-            Debug.Log("Anchor got hit");
-            SetRandomState();
+            ChangeState();
             AssignMaterial();
         }
     }
 
-    private void SetRandomState()
+    private void ChangeState()
     {
-        int index = UnityEngine.Random.Range(0, 3);
-        anchorStatus = (AnchorStatus)(Enum.GetValues(anchorStatus.GetType())).GetValue(index);
+        switch (anchorStatus)
+        {
+            case AnchorStatus.Locked:
+                anchorStatus = AnchorStatus.Available;
+                break;
+            case AnchorStatus.Available:
+                anchorStatus = AnchorStatus.Locked;
+                break;
+        }
     }
 
     private bool CanAssignMaterial()
@@ -113,9 +119,6 @@ public class Anchor : MonoBehaviour
                 break;
             case AnchorStatus.Available:
                 meshRenderer.sharedMaterial = Resources.Load("Materials/Anchor/Available") as Material;
-                break;
-            case AnchorStatus.Selected:
-                meshRenderer.sharedMaterial = Resources.Load("Materials/Anchor/Selected") as Material;
                 break;
         }
     }
