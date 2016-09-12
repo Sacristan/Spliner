@@ -102,15 +102,20 @@ public class AnchorSpliner
 
     private static Transform SplineContainer
     {
+
         get
         {
-           GameObject splines = GameObject.Find("Splines");
+            string containerName = "Splines";
+
+            GameObject splines = GameObject.Find(containerName);
 
             if(splines == null)
             {
-                GameObject rootObj = GameObject.Find("Canvas");
-                splines = new GameObject("Splines");
-                splines.transform.SetParent(rootObj.transform);
+                Anchor anchor = GameObject.FindObjectOfType<Anchor>();
+
+                Transform root = anchor.transform.parent;
+                splines = new GameObject(containerName);
+                splines.transform.SetParent(root);
             }
             return splines.transform;
         }
