@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 
 [CustomEditor(typeof(Anchor))]
 public class AnchorEditor : Editor
@@ -63,8 +64,6 @@ public class AnchorEditor : Editor
 
         Vector3 p0 = ShowPoint(0, bezierSpline);
 
-
-
         for (int i = 1; i < bezierSpline.ControlPointCount; i += 3)
         {
             Vector3 p1 = ShowPoint(i, bezierSpline);
@@ -81,7 +80,7 @@ public class AnchorEditor : Editor
 
             Handles.DrawBezier(p0, p3, p1, p2, Color.green, null, 2f);
 
-            Debug.Log(string.Format("Points: {0} {1} {2} {3} / Spline: {4} {5} {6} {7}", p0, p1, p2, p3, spline.P0, spline.P1, spline.P2, spline.P3));
+            //Debug.Log(string.Format("Points: {0} {1} {2} {3} / Spline: {4} {5} {6} {7}", p0, p1, p2, p3, spline.P0, spline.P1, spline.P2, spline.P3));
 
             //p0 = p3;
         }
@@ -107,9 +106,8 @@ public class AnchorEditor : Editor
 
         if (EditorGUI.EndChangeCheck())
         {
-            //Undo.RecordObject(spline.Spline, "Move Point");
-            //EditorUtility.SetDirty(spline.Spline);
             spline.SetControlPoint(index, handleTransform.InverseTransformPoint(point));
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
         return point;
     }
