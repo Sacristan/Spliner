@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEditor;
 
 public class SplineDecorator
 {
@@ -38,6 +38,10 @@ public class SplineDecorator
             spawnedKnob.transform.SetParent(DecoratorContainer(bezierSpline.Spline));
             spawnedKnob.name = "Knob" + i;
             knob.Spline = bezierSpline.Spline;
+
+            GameObject spawnedVisualisation = PrefabUtility.InstantiatePrefab(SplineMap.KnobVisualisation) as GameObject;
+            spawnedVisualisation.transform.SetParent(spawnedKnob.transform);
+            spawnedVisualisation.transform.localPosition = Vector3.zero;
         }
     }
 
@@ -57,6 +61,11 @@ public class SplineDecorator
     private static float DistancePerKnob
     {
         get { return 0.75f; }
+    }
+
+    private static SplineMap SplineMap
+    {
+        get { return GameObject.FindObjectOfType<SplineMap>(); }
     }
 
     private static void FetchKnobsForSpline(Spline spline)

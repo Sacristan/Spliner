@@ -20,6 +20,11 @@ public class SplineMap : MonoBehaviour
         get { return _anchorVisualisation; }
     }
 
+    public GameObject KnobVisualisation
+    {
+        get { return _knobVisualisation; }
+    }
+
     public Material AnchorLockedMaterial
     {
         get { return _anchorLockedMaterial; }
