@@ -1,14 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class Anchor : MonoBehaviour
 {
-    [SerializeField]
-    private Knob[] _incomingKnobs;
-
-    [SerializeField]
-    private Knob[] _outgoingKnobs;
-
     [SerializeField]
     private List<Spline> _outgoingSplines = new List<Spline>();
 
@@ -21,6 +16,8 @@ public class Anchor : MonoBehaviour
 
     [SerializeField]
     private List<Anchor> _incomingAnchors = new List<Anchor>();
+
+
 
     #region Properties
     public List<Anchor> OutgoingAnchors
@@ -45,18 +42,6 @@ public class Anchor : MonoBehaviour
     {
         get { return _outgoingSplines; }
         set { _outgoingSplines = value; }
-    }
-
-    public Knob[] OutgoingKnobs
-    {
-        get { return _outgoingKnobs; }
-        set { _outgoingKnobs = value; }
-    }
-
-    public Knob[] IncomingKnobs
-    {
-        get { return _incomingKnobs; }
-        set { _incomingKnobs = value; }
     }
 
     #endregion

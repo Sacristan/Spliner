@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEditor;
 
 public class SplineDecorator
 {
@@ -7,7 +7,6 @@ public class SplineDecorator
     public static void Decorate(BezierSpline bezierSpline)
     {
         if (bezierSpline == null || bezierSpline.Spline == null) return;
-
         Cleanup(bezierSpline);
         GenerateKnobs(bezierSpline);
         FetchKnobsForSpline(bezierSpline.Spline);
@@ -15,15 +14,12 @@ public class SplineDecorator
 
     private static void Cleanup(BezierSpline bezierSpline)
     {
-        if (bezierSpline == null || bezierSpline.Spline == null) return;
         foreach (Knob knob in bezierSpline.Spline.Knobs)
             Object.DestroyImmediate(knob.gameObject);
     }
 
     private static void GenerateKnobs(BezierSpline bezierSpline)
     {
-        GameObject knobTemplate = Resources.Load("Knob") as GameObject;
-
         float stepSize = bezierSpline.Length / DistancePerKnob;
         int pointsRequiredOnSpline = Mathf.FloorToInt(stepSize);
 
@@ -33,15 +29,19 @@ public class SplineDecorator
         {
             float stepNormalized = (i * stepSizeF);
 
-            GameObject itemSpawned = Object.Instantiate(knobTemplate) as GameObject;
+            GameObject spawnedKnob = new GameObject("Knob", typeof(Knob));
+            Knob knob = spawnedKnob.GetComponent<Knob>();
 
             Vector3 position = bezierSpline.GetPoint(stepNormalized);
 
-            itemSpawned.transform.localPosition = position;
-            itemSpawned.transform.SetParent(DecoratorContainer(bezierSpline.Spline));
-            itemSpawned.name = "Knob" + i;
-            Knob knob = itemSpawned.GetComponent<Knob>();
+            spawnedKnob.transform.localPosition = position;
+            spawnedKnob.transform.SetParent(DecoratorContainer(bezierSpline.Spline));
+            spawnedKnob.name = "Knob" + i;
             knob.Spline = bezierSpline.Spline;
+
+            GameObject spawnedVisualisation = PrefabUtility.InstantiatePrefab(SplineMap.KnobVisualisation) as GameObject;
+            spawnedVisualisation.transform.SetParent(spawnedKnob.transform);
+            spawnedVisualisation.transform.localPosition = Vector3.zero;
         }
     }
 
@@ -60,7 +60,12 @@ public class SplineDecorator
 
     private static float DistancePerKnob
     {
-        get { return 45f; }
+        get { return 0.75f; }
+    }
+
+    private static SplineMap SplineMap
+    {
+        get { return GameObject.FindObjectOfType<SplineMap>(); }
     }
 
     private static void FetchKnobsForSpline(Spline spline)

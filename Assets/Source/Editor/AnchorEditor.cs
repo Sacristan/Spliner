@@ -48,8 +48,9 @@ public class AnchorEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        if (Application.isPlaying) return;
         DrawDefaultInspector();
+
+        if (Application.isPlaying) return;
 
         if (GUI.changed)
         {
@@ -104,7 +105,8 @@ public class AnchorEditor : Editor
         if(index > 0 && index < 3)
             Handles.color = Color.magenta;
 
-        point = Handles.FreeMoveHandle(point, handleRotation, 10f, Vector3.zero, Handles.RectangleCap);
+        //point = Handles.FreeMoveHandle(point, handleRotation, 10f, Vector3.zero, Handles.RectangleCap);
+        point = Handles.FreeMoveHandle(point, handleRotation, 0.1f, Vector3.zero, Handles.RectangleCap);
         Handles.color = prevColor;
 
         if (EditorGUI.EndChangeCheck())
