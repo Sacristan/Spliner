@@ -10,96 +10,53 @@ public class Anchor : MonoBehaviour
     private Knob[] _outgoingKnobs;
 
     [SerializeField]
-    private List<BezierSpline> _outgoingSplines = new List<BezierSpline>();
+    private List<Spline> _outgoingSplines = new List<Spline>();
 
     [SerializeField]
-    private List<BezierSpline> _incomingSplines = new List<BezierSpline>();
+    private List<Spline> _incomingSplines = new List<Spline>();
 
     [Header("Configure Anchor relations here")]
-
     [SerializeField]
     private List<Anchor> _outgoingAnchors = new List<Anchor>();
 
     [SerializeField]
     private List<Anchor> _incomingAnchors = new List<Anchor>();
 
-
     #region Properties
     public List<Anchor> OutgoingAnchors
     {
-        get
-        {
-            return _outgoingAnchors;
-        }
-
-        set
-        {
-            _outgoingAnchors = value;
-        }
+        get { return _outgoingAnchors; }
+        set { _outgoingAnchors = value; }
     }
 
     public List<Anchor> IncomingAnchors
     {
-        get
-        {
-            return _incomingAnchors;
-        }
-
-        set
-        {
-            _incomingAnchors = value;
-        }
+        get { return _incomingAnchors; }
+        set { _incomingAnchors = value; }
     }
 
-    public List<BezierSpline> IncomingSplines
+    public List<Spline> IncomingSplines
     {
-        get
-        {
-            return _incomingSplines;
-        }
-
-        set
-        {
-            _incomingSplines = value;
-        }
+        get { return _incomingSplines; }
+        set { _incomingSplines = value; }
     }
 
-    public List<BezierSpline> OutgoingSplines
+    public List<Spline> OutgoingSplines
     {
-        get
-        {
-            return _outgoingSplines;
-        }
-
-        set
-        {
-            _outgoingSplines = value;
-        }
+        get { return _outgoingSplines; }
+        set { _outgoingSplines = value; }
     }
 
     public Knob[] OutgoingKnobs
     {
-        get
-        {
-            return _outgoingKnobs;
-        }
-
-        set
-        {
-            _outgoingKnobs = value;
-        }
+        get { return _outgoingKnobs; }
+        set { _outgoingKnobs = value; }
     }
 
     public Knob[] IncomingKnobs
     {
-        get
-        {
-            return _incomingKnobs;
-        }
-        set
-        {
-            _incomingKnobs = value;
-        }
+        get { return _incomingKnobs; }
+        set { _incomingKnobs = value; }
     }
 
     #endregion

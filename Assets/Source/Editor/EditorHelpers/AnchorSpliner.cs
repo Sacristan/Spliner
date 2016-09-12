@@ -17,14 +17,15 @@ public class AnchorSpliner
     {
         Debug.Log("CleanupIncomingSplinesWithAnchor");
 
-        foreach (BezierSpline spline in targetAnchor.IncomingSplines.ToArray())
+        foreach (Spline spline in targetAnchor.IncomingSplines.ToArray())
         {
             if (spline == null) continue;
             if (spline.StartAnchor == anchorToRemove)
             {
                 targetAnchor.IncomingSplines.RemoveAll(item => item == spline);
                 anchorToRemove.OutgoingSplines.RemoveAll(item => item == spline);
-                spline.MarkForDestruction();
+
+                Object.DestroyImmediate(spline.gameObject);
             }
         }
 
@@ -35,27 +36,18 @@ public class AnchorSpliner
     {
         Debug.Log("CleanupOutgoingSplinesWithAnchor");
 
-        foreach (BezierSpline spline in targetAnchor.OutgoingSplines.ToArray())
+        foreach (Spline spline in targetAnchor.OutgoingSplines.ToArray())
         {
             if (spline == null) continue;
             if (spline.EndAnchor == anchorToRemove)
             {
                 targetAnchor.OutgoingSplines.RemoveAll(item => item == spline);
                 anchorToRemove.IncomingSplines.RemoveAll(item => item == spline);
-                spline.MarkForDestruction();
+                Object.DestroyImmediate(spline.gameObject);
             }
         }
 
         CleanupSplines(targetAnchor);
-    }
-
-    public static void DecorateOutgoingSplines(Anchor anchor)
-    {
-        foreach (BezierSpline spline in anchor.IncomingSplines)
-        {
-            if (spline == null) continue;
-            spline.Decorate();
-        }
     }
 
     public static void CleanupSplines(Anchor anchor)
@@ -68,7 +60,7 @@ public class AnchorSpliner
 
     private static void AddSpline(Anchor fromAnchor, Anchor toAnchor)
     {
-        BezierSpline spline = BezierSpline.Create(fromAnchor, toAnchor);
+        Spline spline = CreateSpline(fromAnchor, toAnchor);
         toAnchor.IncomingSplines.Add(spline);
         fromAnchor.OutgoingSplines.Add(spline);
 
@@ -76,12 +68,28 @@ public class AnchorSpliner
         CleanupSplines(fromAnchor);
     }
 
-
-    private static void RemoveRenundantSplinesFor(List<BezierSpline> list)
+    private static Spline CreateSpline(Anchor startAnchor, Anchor endAnchor)
     {
-        List<BezierSpline> splinesMap = new List<BezierSpline>();
+        string splineGOName = string.Format("Spline_{0}->{1}_{2}", startAnchor.gameObject.name, endAnchor.gameObject.name, System.Guid.NewGuid());
 
-        foreach (BezierSpline spline in list.ToArray())
+        //GameObject splineGO = Instantiate(AnchorManager.SplineTemplate.gameObject) as GameObject;
+        GameObject splineGO = new GameObject(splineGOName, typeof(Spline));
+
+        Spline spline = splineGO.GetComponent<Spline>();
+
+        spline.StartAnchor = startAnchor;
+        spline.EndAnchor = endAnchor;
+
+        spline.transform.SetParent(SplineContainer);
+
+        return spline;
+    }
+
+    private static void RemoveRenundantSplinesFor(List<Spline> list)
+    {
+        List<Spline> splinesMap = new List<Spline>();
+
+        foreach (Spline spline in list.ToArray())
         {
             if (spline == null || splinesMap.Contains(spline))
                 list.Remove(spline);
@@ -89,5 +97,22 @@ public class AnchorSpliner
                 splinesMap.Add(spline);
         }
     }
+
     #endregion
+
+    private static Transform SplineContainer
+    {
+        get
+        {
+           GameObject splines = GameObject.Find("Splines");
+
+            if(splines == null)
+            {
+                GameObject rootObj = GameObject.Find("Canvas");
+                splines = new GameObject("Splines");
+                splines.transform.SetParent(rootObj.transform);
+            }
+            return splines.transform;
+        }
+    }
 }

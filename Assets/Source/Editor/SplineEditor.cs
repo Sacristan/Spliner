@@ -1,18 +1,17 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEditor;
 
-[CustomEditor(typeof(BezierSpline))]
-public class BezierSplineEditor : Editor
+[CustomEditor(typeof(Spline))]
+public class SplineEditor : Editor
 {
-
     private void OnSceneGUI()
     {
+
     }
 
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
     }
-
 
 }

@@ -3,31 +3,13 @@ using System.Collections;
 
 public class Knob : MonoBehaviour
 {
-    public BezierSpline Spline
-    {
-        get
-        {
-            return null;
-        }
-    }
+    [SerializeField]
+    private Spline _spline;
 
-    public Anchor OutgoingAnchor
+    public Spline Spline
     {
-        get
-        {
-            if (Spline != null) return Spline.StartAnchor;
-            return null;
-        }
-    }
-
-
-    public Anchor IncomingAnchor
-    {
-        get
-        {
-            if (Spline != null) return Spline.EndAnchor;
-            return null;
-        }
+        get { return _spline; }
+        set { _spline = value; }
     }
 
 }
