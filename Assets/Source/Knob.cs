@@ -1,15 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Knob : MonoBehaviour
+namespace BeetrootLab.Features
 {
-    [SerializeField]
-    private Spline _spline;
-
-    public Spline Spline
+    public class Knob : MonoBehaviour
     {
-        get { return _spline; }
-        set { _spline = value; }
-    }
+        [SerializeField]
+        private Spline _spline;
 
+        public Spline Spline
+        {
+            get { return _spline; }
+            set { _spline = value; }
+        }
+
+    }
 }

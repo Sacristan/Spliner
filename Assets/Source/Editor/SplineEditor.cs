@@ -1,17 +1,21 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(Spline))]
-public class SplineEditor : Editor
+namespace BeetrootLab.Features
 {
-    private void OnSceneGUI()
+
+    [CustomEditor(typeof(Spline))]
+    public class SplineEditor : Editor
     {
+        private void OnSceneGUI()
+        {
+
+        }
+
+        public override void OnInspectorGUI()
+        {
+            DrawDefaultInspector();
+        }
 
     }
-
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-    }
-
 }

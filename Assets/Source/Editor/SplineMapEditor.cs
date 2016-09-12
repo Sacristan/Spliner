@@ -1,64 +1,67 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(SplineMap))]
-public class SplineMapEditor : Editor
+namespace BeetrootLab.Features
 {
-    SplineMap t;
-    SerializedObject GetTarget;
-
-    void OnEnable()
+    [CustomEditor(typeof(SplineMap))]
+    public class SplineMapEditor : Editor
     {
-        t = (SplineMap)target;
-        GetTarget = new SerializedObject(t);
-    }
+        SplineMap t;
+        SerializedObject GetTarget;
 
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-        GetTarget.Update();
-
-        EditorGUILayout.Space();
-        EditorGUILayout.Space();
-
-        if (GUILayout.Button("Add Anchor"))
+        void OnEnable()
         {
-            AddAnchor();
+            t = (SplineMap)target;
+            GetTarget = new SerializedObject(t);
         }
-    }
 
-    private void AddAnchor()
-    {
-        Anchor[] anchors = GameObject.FindObjectsOfType<Anchor>();
-
-        GameObject anchorGo = new GameObject("Anchor"+ anchors.Length, typeof(Anchor));
-        Anchor anchor = anchorGo.GetComponent<Anchor>();
-        AnchorSyncer.Sync(anchor);
-
-        anchorGo.transform.SetParent(AnchorsContainer);
-        anchorGo.transform.localPosition = Vector3.zero;
-
-        GameObject spawnedVisualisation = PrefabUtility.InstantiatePrefab(t.AnchorVisualisation) as GameObject;
-        spawnedVisualisation.transform.SetParent(anchorGo.transform);
-        spawnedVisualisation.transform.localPosition = Vector3.zero;
-    }
-
-
-    private Transform AnchorsContainer
-    {
-        get
+        public override void OnInspectorGUI()
         {
-            string containerName = "Anchors";
-            Transform anchorsContainer = t.transform.Find(containerName);
+            DrawDefaultInspector();
+            GetTarget.Update();
 
-            if(anchorsContainer == null)
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Add Anchor"))
             {
-                anchorsContainer = new GameObject(containerName).transform;
-                anchorsContainer.SetParent(t.transform);
-                anchorsContainer.transform.localPosition = Vector3.zero;
+                AddAnchor();
             }
+        }
 
-            return anchorsContainer;
+        private void AddAnchor()
+        {
+            Anchor[] anchors = GameObject.FindObjectsOfType<Anchor>();
+
+            GameObject anchorGo = new GameObject("Anchor" + anchors.Length, typeof(Anchor));
+            Anchor anchor = anchorGo.GetComponent<Anchor>();
+            AnchorSyncer.Sync(anchor);
+
+            anchorGo.transform.SetParent(AnchorsContainer);
+            anchorGo.transform.localPosition = Vector3.zero;
+
+            GameObject spawnedVisualisation = PrefabUtility.InstantiatePrefab(t.AnchorVisualisation) as GameObject;
+            spawnedVisualisation.transform.SetParent(anchorGo.transform);
+            spawnedVisualisation.transform.localPosition = Vector3.zero;
+        }
+
+
+        private Transform AnchorsContainer
+        {
+            get
+            {
+                string containerName = "Anchors";
+                Transform anchorsContainer = t.transform.Find(containerName);
+
+                if (anchorsContainer == null)
+                {
+                    anchorsContainer = new GameObject(containerName).transform;
+                    anchorsContainer.SetParent(t.transform);
+                    anchorsContainer.transform.localPosition = Vector3.zero;
+                }
+
+                return anchorsContainer;
+            }
         }
     }
 }

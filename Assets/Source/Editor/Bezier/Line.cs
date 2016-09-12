@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-public class Line : MonoBehaviour
+namespace BeetrootLab.Features
 {
-    public Vector3 p0, p1;
+    public class Line : MonoBehaviour
+    {
+        public Vector3 p0, p1;
+    }
 }
