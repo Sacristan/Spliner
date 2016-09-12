@@ -20,8 +20,6 @@ public class SplineDecorator
 
     private static void GenerateKnobs(BezierSpline bezierSpline)
     {
-        GameObject knobTemplate = Resources.Load("Knob") as GameObject;
-
         float stepSize = bezierSpline.Length / DistancePerKnob;
         int pointsRequiredOnSpline = Mathf.FloorToInt(stepSize);
 
@@ -31,14 +29,14 @@ public class SplineDecorator
         {
             float stepNormalized = (i * stepSizeF);
 
-            GameObject itemSpawned = Object.Instantiate(knobTemplate) as GameObject;
+            GameObject spawnedKnob = new GameObject("Knob", typeof(Knob));
+            Knob knob = spawnedKnob.GetComponent<Knob>();
 
             Vector3 position = bezierSpline.GetPoint(stepNormalized);
 
-            itemSpawned.transform.localPosition = position;
-            itemSpawned.transform.SetParent(DecoratorContainer(bezierSpline.Spline));
-            itemSpawned.name = "Knob" + i;
-            Knob knob = itemSpawned.GetComponent<Knob>();
+            spawnedKnob.transform.localPosition = position;
+            spawnedKnob.transform.SetParent(DecoratorContainer(bezierSpline.Spline));
+            spawnedKnob.name = "Knob" + i;
             knob.Spline = bezierSpline.Spline;
         }
     }
