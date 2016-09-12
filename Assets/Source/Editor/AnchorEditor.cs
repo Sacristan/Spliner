@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 
 [CustomEditor(typeof(Anchor))]
 public class AnchorEditor : Editor
@@ -8,8 +9,6 @@ public class AnchorEditor : Editor
     private Anchor targetAnchor;
 
     private bool editorCalled = false;
-
-    private Dictionary<Spline, BezierSpline> splineCollection = new Dictionary<Spline, BezierSpline>();
 
     void OnEnable()
     {
@@ -48,6 +47,7 @@ public class AnchorEditor : Editor
 
     public override void OnInspectorGUI()
     {
+        if (!editorCalled) return;
         DrawDefaultInspector();
 
         if (GUI.changed)
@@ -60,21 +60,9 @@ public class AnchorEditor : Editor
     {
         if (spline == null) return;
 
-        BezierSpline bezierSpline;
-
-        if (splineCollection.ContainsKey(spline))
-        {
-            bezierSpline = splineCollection[spline];
-        }
-        else
-        {
-            bezierSpline = new BezierSpline(spline);
-            splineCollection.Add(spline, bezierSpline);
-        }
+        BezierSpline bezierSpline = new BezierSpline(spline);
 
         Vector3 p0 = ShowPoint(0, bezierSpline);
-
-        //Debug.Log(bezierSpline.ControlPointCount);
 
         for (int i = 1; i < bezierSpline.ControlPointCount; i += 3)
         {
@@ -92,12 +80,11 @@ public class AnchorEditor : Editor
 
             Handles.DrawBezier(p0, p3, p1, p2, Color.green, null, 2f);
 
-            //Debug.Log(string.Format("Points: {0} {1} {2} {3}",p0,p1,p2,p3));
+            //Debug.Log(string.Format("Points: {0} {1} {2} {3} / Spline: {4} {5} {6} {7}", p0, p1, p2, p3, spline.P0, spline.P1, spline.P2, spline.P3));
 
-            p0 = p3;
+            //p0 = p3;
         }
 
-        bezierSpline.UpdateAnchorControlPoints();
         SplineDecorator.Decorate(bezierSpline);
     }
 
@@ -115,15 +102,12 @@ public class AnchorEditor : Editor
 
         EditorGUI.BeginChangeCheck();
 
-        Handles.CubeCap(22, point, Quaternion.identity, 5f);
-
         point = Handles.FreeMoveHandle(point, handleRotation, 10f, Vector3.zero, Handles.RectangleCap);
 
         if (EditorGUI.EndChangeCheck())
         {
-            //Undo.RecordObject(spline, "Move Point");
-            //EditorUtility.SetDirty(spline);
             spline.SetControlPoint(index, handleTransform.InverseTransformPoint(point));
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         }
         return point;
     }

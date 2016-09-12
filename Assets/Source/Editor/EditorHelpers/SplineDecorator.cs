@@ -6,6 +6,8 @@ public class SplineDecorator
 
     public static void Decorate(BezierSpline bezierSpline)
     {
+        if (bezierSpline == null || bezierSpline.Spline == null) return;
+
         Cleanup(bezierSpline);
         GenerateKnobs(bezierSpline);
         FetchKnobsForSpline(bezierSpline.Spline);
