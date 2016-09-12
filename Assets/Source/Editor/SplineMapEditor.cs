@@ -29,12 +29,18 @@ public class SplineMapEditor : Editor
 
     private void AddAnchor()
     {
-        GameObject anchorGo = new GameObject("Anchor_"+System.Guid.NewGuid(), typeof(Anchor));
+        Anchor[] anchors = GameObject.FindObjectsOfType<Anchor>();
+
+        GameObject anchorGo = new GameObject("Anchor"+ anchors.Length, typeof(Anchor));
         Anchor anchor = anchorGo.GetComponent<Anchor>();
         AnchorSyncer.Sync(anchor);
 
         anchorGo.transform.SetParent(AnchorsContainer);
         anchorGo.transform.localPosition = Vector3.zero;
+
+        GameObject spawnedVisualisation = PrefabUtility.InstantiatePrefab(t.AnchorVisualisation) as GameObject;
+        spawnedVisualisation.transform.SetParent(anchorGo.transform);
+        spawnedVisualisation.transform.localPosition = Vector3.zero;
     }
 
 

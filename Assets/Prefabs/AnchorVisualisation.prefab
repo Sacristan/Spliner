@@ -22,9 +22,8 @@ GameObject:
   - 33: {fileID: 33000013622268892}
   - 64: {fileID: 64000011194005602}
   - 23: {fileID: 23000014059571894}
-  - 114: {fileID: 114000010148846178}
   m_Layer: 0
-  m_Name: Anchor
+  m_Name: AnchorVisualisation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -91,19 +90,3 @@ MeshCollider:
   serializedVersion: 2
   m_Convex: 1
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114000010148846178
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010828304026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2d302ce1d6d1834f940c762ccfdff41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _outgoingSplines: []
-  _incomingSplines: []
-  _outgoingAnchors: []
-  _incomingAnchors: []
-  anchorStatus: 0
