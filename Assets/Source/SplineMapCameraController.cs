@@ -1,42 +1,103 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class SplineMapCameraController : MonoBehaviour
+namespace BeetrootLab.Features
 {
-    private Vector3 startPosition = Vector3.zero;
-    private Vector3 endPosition = Vector3.zero;
-
-    Camera _camera;
-
-    void Awake()
+    [RequireComponent(typeof(Camera))]
+    public class SplineMapCameraController : MonoBehaviour
     {
-        _camera = GetComponent<Camera>();
-    }
+        Vector2 oldTouchVector;
+        float oldTouchDistance;
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))    // swipe begins
+        Camera _camera;
+
+        private Touch touch;
+        private float moveSpeed = 15f;
+
+        private Vector2 dragPosStart;
+        private Vector2 dragPosCurrent;
+        private Vector2 dragPosEnd;
+
+        private float dragStartTime;
+        private string debugString;
+
+        #region MonoBehaviour methods
+        void Awake()
         {
-            startPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
+            _camera = GetComponent<Camera>();
         }
-        if (Input.GetMouseButtonUp(0))    // swipe ends
+
+        void Update()
         {
-            endPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
+            if (Input.touchCount > 0)
+            {
+                touch = Input.GetTouch(0);
+
+                switch (touch.phase)
+                {
+                    case TouchPhase.Began:
+                        OnDragStart();
+                        break;
+                    case TouchPhase.Ended:
+                        OnDragEnd();
+                        break;
+                    case TouchPhase.Moved:
+                        OnDragUpdate();
+                        break;
+
+                }
+            }
         }
 
-        if (startPosition != endPosition && startPosition != Vector3.zero && endPosition != Vector3.zero)
+        void OnGUI()
         {
-            float deltaX = endPosition.x - startPosition.x;
-            float deltaY = endPosition.y - startPosition.y;
-
-            Vector2 delta = new Vector2(deltaX, deltaY);
-
-            //Debug.Log(delta);
-
-            transform.Translate(delta);
-
-            startPosition = Vector3.zero;
-            endPosition = Vector3.zero;
+            GUI.Label(new Rect(0, Screen.height - 50, 400, 50), debugString);
         }
+        #endregion
+
+        private void OnDragStart()
+        {
+            dragPosStart = touch.position;
+            dragStartTime = Time.time;
+            debugString = string.Format("OnDragStart: dragStartPos: {0}", dragPosStart);
+        }
+
+        private void OnDragUpdate()
+        {
+            dragPosCurrent = touch.position;
+            debugString = string.Format("OnDragUpdate: dragStartPos: {0} dragPosCurrent: {1}", dragPosStart, dragPosCurrent);
+        }
+
+        private void OnDragEnd()
+        {
+            dragPosEnd = touch.position;
+            float diffTime = Time.time - dragStartTime;
+
+            Vector2 momentum = dragPosEnd - dragPosStart;
+            momentum /= (Time.time - dragStartTime);
+
+            debugString = string.Format("OnDragEnd: dragStartPos: {0} dragPosEnd: {1} Momentum: {2}", dragPosStart, dragPosEnd, momentum);
+
+            Reset();
+        }
+
+        private void Reset()
+        {
+            dragPosStart = Vector2.zero;
+            dragPosEnd = Vector2.zero;
+            dragPosCurrent = Vector2.zero;
+        }
+
+        //private void HandleMovement()
+        //{
+        //    Vector2 deltaPos = Vector2.zero;
+
+        //    deltaPos = touch.deltaPosition;
+
+        //    Vector3 calculatedPosDeltaLocal = deltaPos * _camera.orthographicSize / _camera.pixelHeight * -2f;
+        //    Vector3 calculatedPosDeltaWorld = transform.TransformDirection(calculatedPosDeltaLocal);
+        //    movePos = transform.position + calculatedPosDeltaWorld;
+        //    transform.position = Vector3.Lerp(transform.position, movePos, Time.deltaTime * moveSpeed);
+        //}
+
     }
 }
