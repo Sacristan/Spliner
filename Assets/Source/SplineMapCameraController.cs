@@ -20,6 +20,13 @@ namespace BeetrootLab.Features
         private float dragStartTime;
         private string debugString;
 
+        private Vector3 movePos;
+        private bool thrustInProgress =false;
+
+        private float dampTime;
+
+        Vector3 velocity;
+
         #region MonoBehaviour methods
         void Awake()
         {
@@ -43,8 +50,9 @@ namespace BeetrootLab.Features
                     case TouchPhase.Moved:
                         OnDragUpdate();
                         break;
-
                 }
+
+                HandleMovement();
             }
         }
 
@@ -56,15 +64,29 @@ namespace BeetrootLab.Features
 
         private void OnDragStart()
         {
+            dragPosEnd = Vector2.zero;
             dragPosStart = touch.position;
             dragStartTime = Time.time;
+            movePos = Vector3.zero;
+            thrustInProgress = false;
+
+
             debugString = string.Format("OnDragStart: dragStartPos: {0}", dragPosStart);
         }
 
         private void OnDragUpdate()
         {
             dragPosCurrent = touch.position;
-            debugString = string.Format("OnDragUpdate: dragStartPos: {0} dragPosCurrent: {1}", dragPosStart, dragPosCurrent);
+
+            Vector3 deltaPos = touch.deltaPosition;
+            Vector3 calculatedPosDeltaLocal = deltaPos * _camera.orthographicSize / _camera.pixelHeight * -2f;
+            Vector3 calculatedPosDeltaWorld = transform.TransformDirection(calculatedPosDeltaLocal);
+            movePos = transform.position + calculatedPosDeltaWorld;
+
+            dampTime = Time.deltaTime * moveSpeed;
+
+            debugString = string.Format("OnDragUpdate: dragStartPos: {0} dragPosCurrent: {1} MovePos: {2}", dragPosStart, dragPosCurrent, movePos);
+
         }
 
         private void OnDragEnd()
@@ -72,19 +94,28 @@ namespace BeetrootLab.Features
             dragPosEnd = touch.position;
             float diffTime = Time.time - dragStartTime;
 
-            Vector2 momentum = dragPosEnd - dragPosStart;
+            Vector3 momentum = dragPosEnd - dragPosStart;
             momentum /= (Time.time - dragStartTime);
 
-            debugString = string.Format("OnDragEnd: dragStartPos: {0} dragPosEnd: {1} Momentum: {2}", dragPosStart, dragPosEnd, momentum);
+            Vector3 deltaPos = (dragPosEnd - dragPosStart).normalized;
 
-            Reset();
+            Vector3 calculatedPosDeltaWorld = transform.TransformDirection(deltaPos + momentum);
+            movePos = transform.position + calculatedPosDeltaWorld;
+
+            dampTime = Time.deltaTime * moveSpeed * 500f;
+
+
+            debugString = string.Format("OnDragEnd: dragStartPos: {0} dragPosEnd: {1} Momentum: {2} MovePos: {3}", dragPosStart, dragPosEnd, momentum, movePos);
         }
 
-        private void Reset()
+        private void HandleMovement()
         {
-            dragPosStart = Vector2.zero;
-            dragPosEnd = Vector2.zero;
-            dragPosCurrent = Vector2.zero;
+            if (movePos != Vector3.zero)
+            {
+                //transform.position = Vector3.Lerp(transform.position, movePos, lerpTime);
+
+                transform.position = Vector3.SmoothDamp(transform.position, movePos, ref velocity, dampTime);
+            }
         }
 
         //private void HandleMovement()
