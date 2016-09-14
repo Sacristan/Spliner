@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using BeetrootLab.Features;
 
 public class SplineMapCameraMovement : MonoBehaviour
 {
     private struct Bounds
     {
-       public Vector2 min;
-       public Vector2 max;
+        public Vector2 min;
+        public Vector2 max;
 
-       public override string ToString()
+        public override string ToString()
         {
             return string.Format("Min: {0} Max: {1}", min, max);
         }
@@ -34,7 +35,7 @@ public class SplineMapCameraMovement : MonoBehaviour
     [SerializeField]
     private float inertiaFactor = 0.05f;
 
-    [SerializeField]
+    //[SerializeField]
     private PinnedAxis pinnedAxis = PinnedAxis.X;
 
     [SerializeField]
@@ -223,18 +224,35 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     private void CalculateBounds()
     {
-        //int mapX = 1600;
-        //int mapY = 600;
+        Anchor[] anchors = FindObjectsOfType<Anchor>();
 
-        //float verticalExtent = _camera.orthographicSize;
-        //float horizontalExtent = _camera.orthographicSize * Screen.width / Screen.height;
+        Anchor anchorLeft = null;
+        Anchor anchorRight = null;
 
-        //bounds.min = new Vector2(horizontalExtent - mapX / 2.0f, verticalExtent - mapY / 2.0f);
-        //bounds.max = new Vector2(mapX / 2.0f - horizontalExtent, mapY / 2.0f - verticalExtent);
+        foreach (Anchor anchor in anchors)
+        {
+            if (anchorLeft == null || anchorRight == null)
+            {
+                anchorLeft = anchor;
+                anchorRight = anchor;
+                continue;
+            }
 
-        bounds.min.x = 709;
-        bounds.max.x = 713;
+            float posXAnchor = anchor.transform.position.x;
 
-        Debug.Log("Recalculated bounds: "+bounds);
+            float posXL = anchorLeft.transform.position.x;
+            float posXR = anchorRight.transform.position.x;
+
+            if (posXAnchor > posXR) anchorRight = anchor;
+            if (posXAnchor < posXL) anchorLeft = anchor;
+        }
+
+        float minX = anchorLeft.transform.position.x;
+        float maxX = anchorRight.transform.position.x;
+
+        bounds.min.x = minX;
+        bounds.max.x = maxX;
+
+        Debug.Log("Recalculated bounds: " + bounds);
     }
 }
