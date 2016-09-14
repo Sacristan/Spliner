@@ -3020,8 +3020,7 @@ GameObject:
   - 4: {fileID: 1751121645}
   - 20: {fileID: 1751121644}
   - 81: {fileID: 1751121641}
-  - 114: {fileID: 1751121642}
-  - 114: {fileID: 1751121646}
+  - 114: {fileID: 1751121643}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -3036,15 +3035,15 @@ AudioListener:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1751121640}
   m_Enabled: 1
---- !u!114 &1751121642
+--- !u!114 &1751121643
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1751121640}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d32da104bc4cf54c895e7528595bf81, type: 3}
+  m_Script: {fileID: 11500000, guid: 5c1cbac94a9347a4c887ca4df3fe435b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!20 &1751121644
@@ -3094,28 +3093,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 409671485}
   m_RootOrder: 0
---- !u!114 &1751121646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1751121640}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e135e3d1ad4278d49953815a86374e51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveSensitivityX: 0.25
-  moveSensitivityZ: 0.25
-  updateZoomSensitivity: 1
-  orthoZoomSpeed: 0.05
-  minZoom: 1
-  maxZoom: 20
-  invertMoveX: 0
-  invertMoveZ: 0
-  mapWidth: 1500
-  mapLength: 1500
-  inertiaDuration: 1
 --- !u!1 &1756453335
 GameObject:
   m_ObjectHideFlags: 0
