@@ -17,7 +17,6 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     private enum PinnedAxis { X, Y, Z, XY, XZ, YZ, XYZ }
 
-    private Camera _camera;
     private Touch touch;
 
     [SerializeField]
@@ -56,11 +55,6 @@ public class SplineMapCameraMovement : MonoBehaviour
     private Vector3 desiredMovementDestination;
 
     #region MonoBehaviour methods
-
-    void Awake()
-    {
-        _camera = GetComponent<Camera>();
-    }
 
     void Start()
     {
@@ -111,21 +105,19 @@ public class SplineMapCameraMovement : MonoBehaviour
     /// </summary>
     private void HandleSmoothMovement()
     {
-
         if (desiredMovementDestination != Vector3.zero)
         {
-            Vector3 correctedDestination = desiredMovementDestination;
-            if (handleBounds)
+            transform.position = Vector3.SmoothDamp(transform.position, desiredMovementDestination, ref velocity, dampTime);
+            if(handleBounds)
             {
-                correctedDestination = new Vector3(
+                Vector3 correctedDestination = new Vector3(
                     Mathf.Clamp(desiredMovementDestination.x, bounds.min.x, bounds.max.x),
                     desiredMovementDestination.y,
                     desiredMovementDestination.z
                 );
-            }
 
-            //Debug.Log(string.Format("Bounds: {0} movementMovementDestination: {1} correctedPos: {2}", bounds, desiredMovementDestination, correctedDestination));
-            transform.position = Vector3.SmoothDamp(transform.position, correctedDestination, ref velocity, dampTime);
+                transform.position = Vector3.SmoothDamp(transform.position, correctedDestination, ref velocity, dampTime);
+            }
         }
     }
 
@@ -176,24 +168,27 @@ public class SplineMapCameraMovement : MonoBehaviour
                 case PinnedAxis.X:
                     result = Vector3.right;
                     break;
-                case PinnedAxis.Y:
-                    result = Vector3.up;
-                    break;
-                case PinnedAxis.Z:
-                    result = Vector3.forward;
-                    break;
-                case PinnedAxis.XY:
-                    result = new Vector3(1, 1, 0);
-                    break;
-                case PinnedAxis.XZ:
-                    result = new Vector3(1, 0, 1);
-                    break;
-                case PinnedAxis.YZ:
-                    result = new Vector3(0, 1, 1);
-                    break;
-                case PinnedAxis.XYZ:
-                    result = Vector3.one;
-                    break;
+                default:
+                    Debug.LogError("SplineMapCameraMovement Unsupported Axis: "+ pinnedAxis);
+                    break; 
+                //case PinnedAxis.Y:
+                //    result = Vector3.up;
+                //    break;
+                //case PinnedAxis.Z:
+                //    result = Vector3.forward;
+                //    break;
+                //case PinnedAxis.XY:
+                //    result = new Vector3(1, 1, 0);
+                //    break;
+                //case PinnedAxis.XZ:
+                //    result = new Vector3(1, 0, 1);
+                //    break;
+                //case PinnedAxis.YZ:
+                //    result = new Vector3(0, 1, 1);
+                //    break;
+                //case PinnedAxis.XYZ:
+                //    result = Vector3.one;
+                //    break;
             }
 
             return result;
