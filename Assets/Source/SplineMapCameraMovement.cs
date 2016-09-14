@@ -52,7 +52,7 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     private Vector3 velocity = Vector3.zero;
 
-    private Vector3 movementDestination;
+    private Vector3 desiredMovementDestination;
 
     #region MonoBehaviour methods
 
@@ -75,7 +75,7 @@ public class SplineMapCameraMovement : MonoBehaviour
             switch (touch.phase)
             {
                 case TouchPhase.Began:
-                    movementDestination = Vector3.zero;
+                    desiredMovementDestination = Vector3.zero;
                     scrollVelocity = 0.0f;
                     break;
                 case TouchPhase.Moved:
@@ -105,16 +105,27 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     #region Movement methods
 
+    /// <summary>
+    /// Handles Smooth movement towards desired movement destination
+    /// </summary>
     private void HandleSmoothMovement()
     {
-        if (movementDestination != Vector3.zero)
+
+        if (desiredMovementDestination != Vector3.zero)
         {
-            Vector3 correctedDestination = movementDestination;
+            Vector3 correctedDestination = desiredMovementDestination;
+            if (handleBounds)
+            {
+                correctedDestination = new Vector3(
+                    Mathf.Clamp(desiredMovementDestination.x, bounds.min.x, bounds.max.x),
+                    desiredMovementDestination.y,
+                    desiredMovementDestination.z
+                );
+            }
+
+            //Debug.Log(string.Format("Bounds: {0} movementMovementDestination: {1} correctedPos: {2}", bounds, desiredMovementDestination, correctedDestination));
             transform.position = Vector3.SmoothDamp(transform.position, correctedDestination, ref velocity, dampTime);
         }
-
-        //Vector3.SmoothDamp(transform.position, destination, velocity, dampTime);
-        //transform.position = Mathf.Clamp(transform.position.x, -18, 18), transform.position.y, transform.position.z);
     }
 
     /// <summary>
@@ -122,7 +133,7 @@ public class SplineMapCameraMovement : MonoBehaviour
     /// </summary>
     private void HandleMovement()
     {
-        movementDestination = transform.position + MovementDelta;
+        desiredMovementDestination = transform.position + MovementDelta;
         //transform.position = Vector3.SmoothDamp(transform.position, destination, ref velocity, dampTime);
 
         scrollDirection = touch.deltaPosition.normalized;
@@ -146,7 +157,7 @@ public class SplineMapCameraMovement : MonoBehaviour
             Vector3 deltaPosWithAppliedAxis = new Vector3(deltaPos.x * allowedScrollAxis.x, deltaPos.y * allowedScrollAxis.y, deltaPos.z * allowedScrollAxis.z);
 
             //transform.Translate(deltaPosWithAppliedAxis);
-            movementDestination = transform.position + deltaPosWithAppliedAxis;
+            desiredMovementDestination = transform.position + deltaPosWithAppliedAxis;
 
             if (t >= 1.0f) scrollVelocity = 0.0f;
         }
@@ -212,14 +223,17 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     private void CalculateBounds()
     {
-        int mapX = 800;
-        int mapY = 600;
+        //int mapX = 1600;
+        //int mapY = 600;
 
-        float verticalExtent = _camera.orthographicSize;
-        float horizontalExtent = _camera.orthographicSize * Screen.width / Screen.height;
+        //float verticalExtent = _camera.orthographicSize;
+        //float horizontalExtent = _camera.orthographicSize * Screen.width / Screen.height;
 
-        bounds.min = new Vector2(horizontalExtent - mapX / 2.0f, verticalExtent - mapY / 2.0f);
-        bounds.max = new Vector2(mapX / 2.0f - horizontalExtent, mapY / 2.0f - verticalExtent);
+        //bounds.min = new Vector2(horizontalExtent - mapX / 2.0f, verticalExtent - mapY / 2.0f);
+        //bounds.max = new Vector2(mapX / 2.0f - horizontalExtent, mapY / 2.0f - verticalExtent);
+
+        bounds.min.x = 709;
+        bounds.max.x = 713;
 
         Debug.Log("Recalculated bounds: "+bounds);
     }

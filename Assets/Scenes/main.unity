@@ -3048,11 +3048,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sensitivity: 2.5
   invertAxis: 0
+  dampTime: 0.15
   inertiaDurationInSeconds: 1
   inertiaFactor: 0.05
   pinnedAxis: 0
   handleBounds: 1
-  dampTime: 0.15
 --- !u!20 &1751121644
 Camera:
   m_ObjectHideFlags: 0
