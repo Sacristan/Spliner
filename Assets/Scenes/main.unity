@@ -3046,6 +3046,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c1cbac94a9347a4c887ca4df3fe435b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sensitivity: 0.25
+  invertAxis: 0
+  inertiaDurationInSeconds: 1
+  inertiaFactor: 0.05
+  pinnedAxis: 0
 --- !u!20 &1751121644
 Camera:
   m_ObjectHideFlags: 0

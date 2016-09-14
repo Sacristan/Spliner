@@ -3,9 +3,8 @@ using System.Collections;
 
 public class SplineMapCameraMovement : MonoBehaviour
 {
-    private enum PinnedAxis { X, Y, Z, XY, XZ, YZ, XYZ} 
+    private enum PinnedAxis { X, Y, Z, XY, XZ, YZ, XYZ }
 
-    Camera _camera;
     Touch touch;
 
     [SerializeField]
@@ -18,6 +17,9 @@ public class SplineMapCameraMovement : MonoBehaviour
     private float inertiaDurationInSeconds = 1f;
 
     [SerializeField]
+    private float inertiaFactor = 0.05f;
+
+    [SerializeField]
     private PinnedAxis pinnedAxis = PinnedAxis.X;
 
     private readonly float scrollVelocityTreshold = 100f;
@@ -26,16 +28,13 @@ public class SplineMapCameraMovement : MonoBehaviour
     private float scrollVelocity;
     private Vector3 scrollDirection;
 
-    void Awake()
-    {
-        _camera = GetComponent<Camera>();
-    }
+    #region MonoBehaviour methods
 
     void Update()
     {
         if (Input.touchCount > 0)
         {
-           touch = Input.GetTouch(0);
+            touch = Input.GetTouch(0);
 
             switch (touch.phase)
             {
@@ -52,9 +51,7 @@ public class SplineMapCameraMovement : MonoBehaviour
                     break;
                 case TouchPhase.Stationary:
                     break;
-
                 default:
-                    //touch = null;
                     break;
             }
         }
@@ -63,68 +60,90 @@ public class SplineMapCameraMovement : MonoBehaviour
             HandleScrollMovement();
         }
     }
+    #endregion
 
+    #region Movement methods
+    /// <summary>
+    /// Handles basic movement
+    /// </summary>
     private void HandleMovement()
     {
-        _camera.transform.position += GetMovementVectorByDelta();
+        transform.Translate(MovementDelta);
         scrollDirection = touch.deltaPosition.normalized;
         scrollVelocity = touch.deltaPosition.magnitude / touch.deltaTime;
 
         if (scrollVelocity <= scrollVelocityTreshold) scrollVelocity = 0;
     }
 
+    /// <summary>
+    /// Handles smoothed movement after swipe gesture ended
+    /// </summary>
     private void HandleScrollMovement()
     {
-        if(Mathf.Abs(scrollVelocity) > 0f)
+        if (Mathf.Abs(scrollVelocity) > 0f)
         {
-            //slow down over time
             float t = (Time.time - timeTouchPhaseEnded) / inertiaDurationInSeconds;
             float frameVelocity = Mathf.Lerp(scrollVelocity, 0.0f, t);
-            _camera.transform.position += -(Vector3)scrollDirection.normalized * (frameVelocity * 0.05f) * Time.deltaTime;
+
+            Vector3 deltaPos = (Vector3)scrollDirection.normalized * (frameVelocity * inertiaFactor) * Time.deltaTime * -1f;
+            Vector3 allowedScrollAxis = AllowedScrollAxis;
+            Vector3 deltaPosWithAppliedAxis = new Vector3(deltaPos.x * allowedScrollAxis.x, deltaPos.y * allowedScrollAxis.y, deltaPos.z * allowedScrollAxis.z);
+            transform.Translate(deltaPosWithAppliedAxis);
 
             if (t >= 1.0f) scrollVelocity = 0.0f;
         }
     }
+    #endregion
 
-    private Vector3 GetMovementVectorByDelta()
+    private Vector3 AllowedScrollAxis
     {
-        Vector3 delta = touch.deltaPosition;
-
-        float positionX = 0f;
-        float positionY = 0f;
-        float positionZ = 0f;
-
-        switch (pinnedAxis)
+        get
         {
-            case PinnedAxis.X:
-                positionX = PosFromDelta(delta.x);
-                break;
-            case PinnedAxis.Y:
-                positionY = PosFromDelta(delta.y);
-                break;
-            case PinnedAxis.Z:
-                positionZ = PosFromDelta(delta.z);
-                break;
-            case PinnedAxis.XY:
-                positionX = PosFromDelta(delta.x);
-                positionY = PosFromDelta(delta.y);
-                break;
-            case PinnedAxis.XZ:
-                positionX = PosFromDelta(delta.x);
-                positionZ = PosFromDelta(delta.z);
-                break;
-            case PinnedAxis.YZ:
-                positionY = PosFromDelta(delta.y);
-                positionZ = PosFromDelta(delta.z);
-                break;
-            case PinnedAxis.XYZ:
-                positionX = PosFromDelta(delta.x);
-                positionY = PosFromDelta(delta.y);
-                positionZ = PosFromDelta(delta.z);
-                break;
-        }
+            Vector3 result = Vector3.zero;
 
-        return new Vector3(positionX, positionY, positionZ);
+            switch (pinnedAxis)
+            {
+                case PinnedAxis.X:
+                    result = Vector3.right;
+                    break;
+                case PinnedAxis.Y:
+                    result = Vector3.up;
+                    break;
+                case PinnedAxis.Z:
+                    result = Vector3.forward;
+                    break;
+                case PinnedAxis.XY:
+                    result = new Vector3(1, 1, 0);
+                    break;
+                case PinnedAxis.XZ:
+                    result = new Vector3(1, 0, 1);
+                    break;
+                case PinnedAxis.YZ:
+                    result = new Vector3(0, 1, 1);
+                    break;
+                case PinnedAxis.XYZ:
+                    result = Vector3.one;
+                    break;
+            }
+
+            return result;
+        }
+    }
+
+    private Vector3 MovementDelta
+    {
+        get
+        {
+            Vector3 delta = touch.deltaPosition;
+
+            float positionX = PosFromDelta(delta.x);
+            float positionY = PosFromDelta(delta.y);
+            float positionZ = PosFromDelta(delta.z);
+
+            Vector3 allowedScrollAxis = AllowedScrollAxis;
+
+            return new Vector3(positionX * allowedScrollAxis.x, positionY * allowedScrollAxis.y, positionZ * allowedScrollAxis.z);
+        }
     }
 
     private float PosFromDelta(float delta)
