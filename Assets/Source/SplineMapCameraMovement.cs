@@ -47,12 +47,9 @@ public class SplineMapCameraMovement : MonoBehaviour
     private Vector3 scrollDirection;
 
     Bounds bounds;
-
-    private Vector3 boundTo;
-
     private Vector3 velocity = Vector3.zero;
 
-    private Vector3 desiredMovementDestination;
+    private Vector3 deltaMovement;
 
     #region MonoBehaviour methods
 
@@ -70,7 +67,7 @@ public class SplineMapCameraMovement : MonoBehaviour
             switch (touch.phase)
             {
                 case TouchPhase.Began:
-                    desiredMovementDestination = Vector3.zero;
+                    deltaMovement = Vector3.zero;
                     scrollVelocity = 0.0f;
                     break;
                 case TouchPhase.Moved:
@@ -105,18 +102,30 @@ public class SplineMapCameraMovement : MonoBehaviour
     /// </summary>
     private void HandleSmoothMovement()
     {
-        if (desiredMovementDestination != Vector3.zero)
+        if (deltaMovement != Vector3.zero)
         {
-            transform.position = Vector3.SmoothDamp(transform.position, desiredMovementDestination, ref velocity, dampTime);
-            if(handleBounds)
-            {
-                Vector3 correctedDestination = new Vector3(
-                    Mathf.Clamp(desiredMovementDestination.x, bounds.min.x, bounds.max.x),
-                    desiredMovementDestination.y,
-                    desiredMovementDestination.z
-                );
+            Vector3 correctedDeltaMovement = deltaMovement;
 
-                transform.position = Vector3.SmoothDamp(transform.position, correctedDestination, ref velocity, dampTime);
+            if (touch.phase == TouchPhase.Moved)
+            {
+                transform.Translate(correctedDeltaMovement * dampTime);
+            }
+            else
+            {
+                Vector3 desiredMovementDestination = transform.position + correctedDeltaMovement;
+
+                transform.position = Vector3.SmoothDamp(transform.position, desiredMovementDestination, ref velocity, dampTime);
+
+                if (handleBounds)
+                {
+                    Vector3 correctedDestination = new Vector3(
+                        Mathf.Clamp(desiredMovementDestination.x, bounds.min.x, bounds.max.x),
+                        desiredMovementDestination.y,
+                        desiredMovementDestination.z
+                    );
+
+                    transform.position = Vector3.SmoothDamp(transform.position, correctedDestination, ref velocity, dampTime);
+                }
             }
         }
     }
@@ -126,7 +135,7 @@ public class SplineMapCameraMovement : MonoBehaviour
     /// </summary>
     private void HandleMovement()
     {
-        desiredMovementDestination = transform.position + MovementDelta;
+        deltaMovement = MovementDelta;
         //transform.position = Vector3.SmoothDamp(transform.position, destination, ref velocity, dampTime);
 
         scrollDirection = touch.deltaPosition.normalized;
@@ -150,7 +159,7 @@ public class SplineMapCameraMovement : MonoBehaviour
             Vector3 deltaPosWithAppliedAxis = new Vector3(deltaPos.x * allowedScrollAxis.x, deltaPos.y * allowedScrollAxis.y, deltaPos.z * allowedScrollAxis.z);
 
             //transform.Translate(deltaPosWithAppliedAxis);
-            desiredMovementDestination = transform.position + deltaPosWithAppliedAxis;
+            deltaMovement = deltaPosWithAppliedAxis;
 
             if (t >= 1.0f) scrollVelocity = 0.0f;
         }
