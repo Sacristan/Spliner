@@ -104,7 +104,7 @@ public class SplineMapCameraMovement : MonoBehaviour
     {
         if (deltaMovement != Vector3.zero)
         {
-            Vector3 correctedDeltaMovement = deltaMovement;
+            Vector3 correctedDeltaMovement = deltaMovement / ((float) Screen.width / 1000f);
 
             if (touch.phase == TouchPhase.Moved)
             {
@@ -118,8 +118,10 @@ public class SplineMapCameraMovement : MonoBehaviour
 
                 if (handleBounds)
                 {
+                    float offset = Screen.width * 0.005f;
+                    
                     Vector3 correctedDestination = new Vector3(
-                        Mathf.Clamp(desiredMovementDestination.x, bounds.min.x, bounds.max.x),
+                        Mathf.Clamp(desiredMovementDestination.x, bounds.min.x + offset, bounds.max.x - offset),
                         desiredMovementDestination.y,
                         desiredMovementDestination.z
                     );
@@ -136,7 +138,6 @@ public class SplineMapCameraMovement : MonoBehaviour
     private void HandleMovement()
     {
         deltaMovement = MovementDelta;
-        //transform.position = Vector3.SmoothDamp(transform.position, destination, ref velocity, dampTime);
 
         scrollDirection = touch.deltaPosition.normalized;
         scrollVelocity = touch.deltaPosition.magnitude / touch.deltaTime;
@@ -158,7 +159,6 @@ public class SplineMapCameraMovement : MonoBehaviour
             Vector3 allowedScrollAxis = AllowedScrollAxis;
             Vector3 deltaPosWithAppliedAxis = new Vector3(deltaPos.x * allowedScrollAxis.x, deltaPos.y * allowedScrollAxis.y, deltaPos.z * allowedScrollAxis.z);
 
-            //transform.Translate(deltaPosWithAppliedAxis);
             deltaMovement = deltaPosWithAppliedAxis;
 
             if (t >= 1.0f) scrollVelocity = 0.0f;
