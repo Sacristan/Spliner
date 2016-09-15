@@ -4,6 +4,51 @@ using BeetrootLab.Features;
 
 public class SplineMapCameraMovement : MonoBehaviour
 {
+
+    private struct Bounds
+    {
+        private float minX;
+        private float maxX;
+
+        public Bounds(float min, float max)
+        {
+            minX = min;
+            maxX = max;
+        }
+
+        //Screen.width* 0.005f
+        public override string ToString()
+        {
+            return string.Format("Min X: {0} Max X: {1}", minX, maxX);
+        }
+
+        private float Offset
+        {
+            get { return Screen.width * 0.005f; }
+        }
+
+        public float MinXBoundary1
+        {
+            get { return minX + Offset; }
+        }
+
+        public float MinXBoundary2
+        {
+            get { return minX - Offset; }
+        }
+
+        public float MaxXBoundary1
+        {
+            get { return maxX - Offset; }
+        }
+
+        public float MaxXBoundary2
+        {
+            get { return maxX + Offset; }
+        }
+
+    }
+
     private Touch touch;
 
     [SerializeField]
@@ -29,8 +74,7 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     private Vector2 touchPosLastFrame;
 
-    private float minX;
-    private float maxX;
+    Bounds bounds;
 
     #region Properties
 
@@ -105,8 +149,10 @@ public class SplineMapCameraMovement : MonoBehaviour
         }
         else
         {
-            Vector2 swipeScrollMovement = GetSwipeScrollMovement();
-            HandleMovementSmoothing(swipeScrollMovement);
+            //Vector2 swipeScrollMovement = GetSwipeScrollMovement();
+            //HandleMovementSmoothing(swipeScrollMovement);
+
+            HandleBounds();
         }
 
         touchPosLastFrame = touch.position;
@@ -122,7 +168,7 @@ public class SplineMapCameraMovement : MonoBehaviour
         Vector3 calculatedPosOnAxis = new Vector3(calculatedPos.x, 0, 0);
 
         Vector3 desiredPosition = transform.position + transform.TransformDirection(calculatedPosOnAxis);
-        desiredPosition.x = Mathf.Clamp(desiredPosition.x, minX, maxX);
+        desiredPosition.x = Mathf.Clamp(desiredPosition.x, bounds.MinXBoundary2, bounds.MaxXBoundary2);
         transform.position = desiredPosition;
 
         CalculateScrollVelocity();
@@ -130,8 +176,9 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     private void CalculateScrollVelocity()
     {
-        scrollDirection = touch.deltaPosition.normalized;
-        scrollVelocity = touch.deltaPosition.magnitude / touch.deltaTime;
+        scrollDirection = TouchDeltaPercentage.normalized;
+        scrollVelocity = TouchDeltaPercentage.magnitude / touch.deltaTime;
+        scrollVelocity *= 1000f;
         if (scrollVelocity <= scrollVelocityTreshold) scrollVelocity = 0;
     }
 
@@ -148,20 +195,18 @@ public class SplineMapCameraMovement : MonoBehaviour
             if (Input.touchCount < 1)
             {
                 transform.position = Vector3.SmoothDamp(transform.position, desiredMovementDestination, ref velocity, DampTime);
-                HandleBounds(desiredMovementDestination);
             }
         }
     }
 
-    private void HandleBounds(Vector3 desiredMovementDestination)
+    private void HandleBounds()
     {
         if (!handleBounds) return;
-        float offset = Screen.width * 0.005f;
 
         Vector3 correctedDestination = new Vector3(
-            Mathf.Clamp(desiredMovementDestination.x, minX + offset, maxX - offset),
-            desiredMovementDestination.y,
-            desiredMovementDestination.z
+            Mathf.Clamp(transform.position.x, bounds.MinXBoundary1, bounds.MaxXBoundary1),
+            transform.position.y,
+            transform.position.z
         );
 
         transform.position = Vector3.SmoothDamp(transform.position, correctedDestination, ref velocity, DampTime);
@@ -229,9 +274,8 @@ public class SplineMapCameraMovement : MonoBehaviour
             if (posXAnchor < posXL) anchorLeft = anchor;
         }
 
-        minX = anchorLeft.transform.position.x;
-        maxX = anchorRight.transform.position.x;
+        bounds = new Bounds(anchorLeft.transform.position.x, anchorRight.transform.position.x);
 
-        Debug.Log(string.Format("Calculated bounds: min: {0} max: {1}", minX, maxX));
+        Debug.Log("Calculated bounds: " + bounds);
     }
 }
