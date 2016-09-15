@@ -1,17 +1,62 @@
 ﻿using UnityEngine;
 using System.Collections;
+using BeetrootLab.Features;
+using System;
 
 public class SplineMapCameraMovement : MonoBehaviour
 {
-    private enum PinnedAxis { X, Y, Z, XY, XZ, YZ, XYZ }
 
-    Touch touch;
+    private struct Bounds
+    {
+        private float minX;
+        private float maxX;
+
+        public Bounds(float min, float max)
+        {
+            minX = min;
+            maxX = max;
+        }
+
+        //Screen.width* 0.005f
+        public override string ToString()
+        {
+            return string.Format("Min X: {0} Max X: {1}", minX, maxX);
+        }
+
+        private float Offset
+        {
+            get { return Screen.width * 0.005f; }
+        }
+
+        public float MinXBoundaryInternal
+        {
+            get { return minX + Offset; }
+        }
+
+        public float MinXBoundaryExternal
+        {
+            get { return minX - Offset; }
+        }
+
+        public float MaxXBoundaryInternal
+        {
+            get { return maxX - Offset; }
+        }
+
+        public float MaxXBoundaryExternal
+        {
+            get { return maxX + Offset; }
+        }
+
+    }
+
+    private Touch touch;
 
     [SerializeField]
-    private float sensitivity = 0.25f;
+    private float scrollSensitivity = 5f;
 
     [SerializeField]
-    private bool invertAxis = false;
+    public float dampTime = 0.15f;
 
     [SerializeField]
     private float inertiaDurationInSeconds = 1f;
@@ -20,7 +65,7 @@ public class SplineMapCameraMovement : MonoBehaviour
     private float inertiaFactor = 0.05f;
 
     [SerializeField]
-    private PinnedAxis pinnedAxis = PinnedAxis.X;
+    private bool handleBounds = false;
 
     private readonly float scrollVelocityTreshold = 100f;
 
@@ -28,7 +73,57 @@ public class SplineMapCameraMovement : MonoBehaviour
     private float scrollVelocity;
     private Vector3 scrollDirection;
 
+    private Camera _camera;
+    private Vector3 velocity = Vector3.zero;
+
+    private Vector2 touchPosLastFrame;
+
+    Bounds bounds;
+
+    #region Properties
+
+    private float DampTime
+    {
+        get { return dampTime; }
+    }
+
+    private Vector2 AllowedScrollAxis
+    {
+        get { return Vector2.right; }
+    }
+
+    private Vector2 TouchPercentage
+    {
+        get
+        {
+            return GetPercentageVector(touch.position);
+        }
+    }
+
+    private Vector2 PrevTouchPercentage
+    {
+        get
+        {
+            return GetPercentageVector(touchPosLastFrame);
+        }
+    }
+
+    private Vector2 TouchDeltaPercentage
+    {
+        get
+        {
+            return TouchPercentage - PrevTouchPercentage;
+        }
+    }
+    #endregion
+
     #region MonoBehaviour methods
+
+    void Start()
+    {
+        _camera = GetComponent<Camera>();
+        CalculateBounds();
+    }
 
     void Update()
     {
@@ -40,12 +135,14 @@ public class SplineMapCameraMovement : MonoBehaviour
             {
                 case TouchPhase.Began:
                     scrollVelocity = 0.0f;
+                    touchPosLastFrame = Vector2.zero;
                     break;
                 case TouchPhase.Moved:
                     HandleMovement();
                     break;
                 case TouchPhase.Ended:
                     timeTouchPhaseEnded = Time.time;
+                    //Debug.Break();
                     break;
                 case TouchPhase.Canceled:
                     break;
@@ -57,29 +154,83 @@ public class SplineMapCameraMovement : MonoBehaviour
         }
         else
         {
-            HandleScrollMovement();
+            Vector2 swipeScrollMovement = GetSwipeScrollMovement();
+            HandleMovementSmoothing(swipeScrollMovement);
+
+            HandleBounds();
         }
+
+        if (Input.touchCount > 0) touchPosLastFrame = touch.position;
     }
+
     #endregion
 
     #region Movement methods
-    /// <summary>
-    /// Handles basic movement
-    /// </summary>
+
     private void HandleMovement()
     {
-        transform.Translate(MovementDelta);
-        scrollDirection = touch.deltaPosition.normalized;
-        scrollVelocity = touch.deltaPosition.magnitude / touch.deltaTime;
+        Vector3 calculatedPos = (Vector3)((touchPosLastFrame - touch.position) * _camera.orthographicSize / _camera.pixelHeight * 2f);
+        Vector3 calculatedPosOnAxis = new Vector3(calculatedPos.x, 0, 0);
+
+        Vector3 desiredPosition = transform.position + transform.TransformDirection(calculatedPosOnAxis);
+        transform.position = ClampWithinExternalBounds(desiredPosition);
+
+        CalculateScrollVelocity();
+    }
+
+    private void CalculateScrollVelocity()
+    {
+        Vector2 correctedDeltaPos = touch.deltaPosition * _camera.orthographicSize / _camera.pixelHeight * scrollVelocityTreshold * scrollSensitivity;
+
+        scrollDirection = correctedDeltaPos.normalized;
+        scrollVelocity = correctedDeltaPos.magnitude / touch.deltaTime;
 
         if (scrollVelocity <= scrollVelocityTreshold) scrollVelocity = 0;
+
+        //Debug.Log("CalculateScrollVelocity: "+scrollVelocity);
+    }
+
+    private void HandleBounds()
+    {
+        if (!handleBounds) return;
+
+        if (transform.position.x < bounds.MinXBoundaryInternal || transform.position.x > bounds.MaxXBoundaryInternal) scrollVelocity = 0f;
+
+        Vector3 correctedDestination = new Vector3(
+            Mathf.Clamp(transform.position.x, bounds.MinXBoundaryInternal, bounds.MaxXBoundaryInternal),
+            transform.position.y,
+            transform.position.z
+        );
+
+        transform.position = Vector3.SmoothDamp(transform.position, correctedDestination, ref velocity, DampTime);
+    }
+
+    /// <summary>
+    /// Handles Smooth movement towards desired movement destination
+    /// </summary>
+    /// 
+    private void HandleMovementSmoothing(Vector2 deltaMovement)
+    {
+        if (deltaMovement != Vector2.zero)
+        {
+            Vector3 desiredMovementDestination = ClampWithinExternalBounds( transform.position + (Vector3)deltaMovement );
+
+            if (Input.touchCount < 1)
+            {
+                transform.position = Vector3.SmoothDamp(transform.position, desiredMovementDestination, ref velocity, DampTime);
+            }
+        }
     }
 
     /// <summary>
     /// Handles smoothed movement after swipe gesture ended
     /// </summary>
-    private void HandleScrollMovement()
+    private Vector2 GetSwipeScrollMovement()
     {
+        Vector2 deltaMovement = Vector2.zero;
+
+        //Debug.Log("GetSwipeScrollMovement scrollVelocity:" + scrollVelocity);
+
         if (Mathf.Abs(scrollVelocity) > 0f)
         {
             float t = (Time.time - timeTouchPhaseEnded) / inertiaDurationInSeconds;
@@ -88,67 +239,57 @@ public class SplineMapCameraMovement : MonoBehaviour
             Vector3 deltaPos = (Vector3)scrollDirection.normalized * (frameVelocity * inertiaFactor) * Time.deltaTime * -1f;
             Vector3 allowedScrollAxis = AllowedScrollAxis;
             Vector3 deltaPosWithAppliedAxis = new Vector3(deltaPos.x * allowedScrollAxis.x, deltaPos.y * allowedScrollAxis.y, deltaPos.z * allowedScrollAxis.z);
-            transform.Translate(deltaPosWithAppliedAxis);
+
+            deltaMovement = deltaPosWithAppliedAxis;
 
             if (t >= 1.0f) scrollVelocity = 0.0f;
         }
+
+        return deltaMovement;
     }
     #endregion
 
-    private Vector3 AllowedScrollAxis
+    private Vector3 ClampWithinExternalBounds(Vector3 desiredPosition)
     {
-        get
-        {
-            Vector3 result = Vector3.zero;
+        desiredPosition.x = Mathf.Clamp(desiredPosition.x, bounds.MinXBoundaryExternal, bounds.MaxXBoundaryExternal);
+        return desiredPosition;
+    }
 
-            switch (pinnedAxis)
+    private Vector2 GetPercentageVector(Vector2 vector)
+    {
+        return new Vector2(
+            vector.x / Screen.width,
+            vector.y / Screen.height
+        );
+    }
+
+    private void CalculateBounds()
+    {
+        Anchor[] anchors = FindObjectsOfType<Anchor>();
+
+        Anchor anchorLeft = null;
+        Anchor anchorRight = null;
+
+        foreach (Anchor anchor in anchors)
+        {
+            if (anchorLeft == null || anchorRight == null)
             {
-                case PinnedAxis.X:
-                    result = Vector3.right;
-                    break;
-                case PinnedAxis.Y:
-                    result = Vector3.up;
-                    break;
-                case PinnedAxis.Z:
-                    result = Vector3.forward;
-                    break;
-                case PinnedAxis.XY:
-                    result = new Vector3(1, 1, 0);
-                    break;
-                case PinnedAxis.XZ:
-                    result = new Vector3(1, 0, 1);
-                    break;
-                case PinnedAxis.YZ:
-                    result = new Vector3(0, 1, 1);
-                    break;
-                case PinnedAxis.XYZ:
-                    result = Vector3.one;
-                    break;
+                anchorLeft = anchor;
+                anchorRight = anchor;
+                continue;
             }
 
-            return result;
+            float posXAnchor = anchor.transform.position.x;
+
+            float posXL = anchorLeft.transform.position.x;
+            float posXR = anchorRight.transform.position.x;
+
+            if (posXAnchor > posXR) anchorRight = anchor;
+            if (posXAnchor < posXL) anchorLeft = anchor;
         }
-    }
 
-    private Vector3 MovementDelta
-    {
-        get
-        {
-            Vector3 delta = touch.deltaPosition;
+        bounds = new Bounds(anchorLeft.transform.position.x, anchorRight.transform.position.x);
 
-            float positionX = PosFromDelta(delta.x);
-            float positionY = PosFromDelta(delta.y);
-            float positionZ = PosFromDelta(delta.z);
-
-            Vector3 allowedScrollAxis = AllowedScrollAxis;
-
-            return new Vector3(positionX * allowedScrollAxis.x, positionY * allowedScrollAxis.y, positionZ * allowedScrollAxis.z);
-        }
-    }
-
-    private float PosFromDelta(float delta)
-    {
-        float pos = delta * sensitivity * Time.deltaTime;
-        return invertAxis ? pos : pos * -1;
+        Debug.Log("Calculated bounds: " + bounds);
     }
 }
