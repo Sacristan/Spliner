@@ -15,12 +15,10 @@ public class SplineMapCameraMovement : MonoBehaviour
         }
     }
 
-    private enum PinnedAxis { X, Y, Z, XY, XZ, YZ, XYZ }
-
     private Touch touch;
 
     [SerializeField]
-    private float sensitivity = 2.5f;
+    private float sensitivity = 3.5f;
 
     [SerializeField]
     private bool invertAxis = false;
@@ -34,9 +32,6 @@ public class SplineMapCameraMovement : MonoBehaviour
     [SerializeField]
     private float inertiaFactor = 0.05f;
 
-    //[SerializeField]
-    private PinnedAxis pinnedAxis = PinnedAxis.X;
-
     [SerializeField]
     private bool handleBounds = false;
 
@@ -47,19 +42,25 @@ public class SplineMapCameraMovement : MonoBehaviour
     private Vector3 scrollDirection;
 
     Bounds bounds;
+
+    private Camera _camera;
     private Vector3 velocity = Vector3.zero;
 
-    private Vector3 deltaMovement;
+    private Vector2 touchPosThisFrame;
+    private Vector2 touchPosLastFrame;
 
     #region MonoBehaviour methods
 
     void Start()
     {
+        _camera = GetComponent<Camera>();
         CalculateBounds();
     }
 
     void Update()
     {
+        Vector2 deltaMovement = Vector2.zero;
+
         if (Input.touchCount > 0)
         {
             touch = Input.GetTouch(0);
@@ -67,11 +68,11 @@ public class SplineMapCameraMovement : MonoBehaviour
             switch (touch.phase)
             {
                 case TouchPhase.Began:
-                    deltaMovement = Vector3.zero;
                     scrollVelocity = 0.0f;
+                    touchPosLastFrame = Vector2.zero;
                     break;
                 case TouchPhase.Moved:
-                    HandleMovement();
+                    deltaMovement = GetSwipeMovement();
                     break;
                 case TouchPhase.Ended:
                     timeTouchPhaseEnded = Time.time;
@@ -86,11 +87,11 @@ public class SplineMapCameraMovement : MonoBehaviour
         }
         else
         {
-            HandleScrollMovement();
+            deltaMovement = GetSwipeScrollMovement();
         }
 
-
-        HandleSmoothMovement();
+        HandleSmoothMovement(deltaMovement);
+        touchPosLastFrame = touch.position;
     }
 
     #endregion
@@ -100,26 +101,24 @@ public class SplineMapCameraMovement : MonoBehaviour
     /// <summary>
     /// Handles Smooth movement towards desired movement destination
     /// </summary>
-    private void HandleSmoothMovement()
+    private void HandleSmoothMovement(Vector2 deltaMovement)
     {
-        if (deltaMovement != Vector3.zero)
+        if (deltaMovement != Vector2.zero)
         {
-            Vector3 correctedDeltaMovement = deltaMovement / ((float) Screen.width / 1000f);
+            Vector3 desiredMovementDestination = transform.position + (Vector3) deltaMovement;
 
             if (touch.phase == TouchPhase.Moved)
             {
-                transform.Translate(correctedDeltaMovement * dampTime);
+                transform.position = desiredMovementDestination;
             }
             else
             {
-                Vector3 desiredMovementDestination = transform.position + correctedDeltaMovement;
-
                 transform.position = Vector3.SmoothDamp(transform.position, desiredMovementDestination, ref velocity, dampTime);
 
                 if (handleBounds)
                 {
                     float offset = Screen.width * 0.005f;
-                    
+
                     Vector3 correctedDestination = new Vector3(
                         Mathf.Clamp(desiredMovementDestination.x, bounds.min.x + offset, bounds.max.x - offset),
                         desiredMovementDestination.y,
@@ -132,83 +131,80 @@ public class SplineMapCameraMovement : MonoBehaviour
         }
     }
 
+    private Vector2 TouchPercentage
+    {
+        get
+        {
+            return new Vector2(touch.position.x / Screen.width, touch.position.y / Screen.height);
+        }
+    }
+
+    private Vector2 PrevTouchPercentage
+    {
+        get
+        {
+            return new Vector2(touchPosLastFrame.x / Screen.width, touchPosLastFrame.y / Screen.height);
+        }
+    }
+
+    private Vector2 TouchDeltaPercentage
+    {
+        get
+        {
+            return TouchPercentage - PrevTouchPercentage; 
+        }
+    }
+
     /// <summary>
     /// Handles basic movement
     /// </summary>
-    private void HandleMovement()
+    private Vector2 GetSwipeMovement()
     {
-        deltaMovement = MovementDelta;
+        //Debug.Log(TouchDeltaPercentage);
 
-        scrollDirection = touch.deltaPosition.normalized;
-        scrollVelocity = touch.deltaPosition.magnitude / touch.deltaTime;
+        scrollDirection = TouchDeltaPercentage;
+        scrollVelocity = scrollDirection.magnitude / touch.deltaTime;
 
         if (scrollVelocity <= scrollVelocityTreshold) scrollVelocity = 0;
+
+        return MovementDelta;
     }
 
     /// <summary>
     /// Handles smoothed movement after swipe gesture ended
     /// </summary>
-    private void HandleScrollMovement()
+    private Vector2 GetSwipeScrollMovement()
     {
-        if (Mathf.Abs(scrollVelocity) > 0f)
-        {
-            float t = (Time.time - timeTouchPhaseEnded) / inertiaDurationInSeconds;
-            float frameVelocity = Mathf.Lerp(scrollVelocity, 0.0f, t);
+        Vector2 deltaMovement = Vector2.zero;
 
-            Vector3 deltaPos = (Vector3)scrollDirection.normalized * (frameVelocity * inertiaFactor) * Time.deltaTime * -1f;
-            Vector3 allowedScrollAxis = AllowedScrollAxis;
-            Vector3 deltaPosWithAppliedAxis = new Vector3(deltaPos.x * allowedScrollAxis.x, deltaPos.y * allowedScrollAxis.y, deltaPos.z * allowedScrollAxis.z);
+        //if (Mathf.Abs(scrollVelocity) > 0f)
+        //{
+        //    float t = (Time.time - timeTouchPhaseEnded) / inertiaDurationInSeconds;
+        //    float frameVelocity = Mathf.Lerp(scrollVelocity, 0.0f, t);
 
-            deltaMovement = deltaPosWithAppliedAxis;
+        //    Vector3 deltaPos = (Vector3)scrollDirection.normalized * (frameVelocity * inertiaFactor) * Time.deltaTime * -1f;
+        //    Vector3 allowedScrollAxis = AllowedScrollAxis;
+        //    Vector3 deltaPosWithAppliedAxis = new Vector3(deltaPos.x * allowedScrollAxis.x, deltaPos.y * allowedScrollAxis.y, deltaPos.z * allowedScrollAxis.z);
 
-            if (t >= 1.0f) scrollVelocity = 0.0f;
-        }
+        //    deltaMovement = deltaPosWithAppliedAxis;
+
+        //    if (t >= 1.0f) scrollVelocity = 0.0f;
+        //}
+
+        return deltaMovement;
     }
     #endregion
 
     private Vector3 AllowedScrollAxis
     {
-        get
-        {
-            Vector3 result = Vector3.zero;
-
-            switch (pinnedAxis)
-            {
-                case PinnedAxis.X:
-                    result = Vector3.right;
-                    break;
-                default:
-                    Debug.LogError("SplineMapCameraMovement Unsupported Axis: "+ pinnedAxis);
-                    break; 
-                //case PinnedAxis.Y:
-                //    result = Vector3.up;
-                //    break;
-                //case PinnedAxis.Z:
-                //    result = Vector3.forward;
-                //    break;
-                //case PinnedAxis.XY:
-                //    result = new Vector3(1, 1, 0);
-                //    break;
-                //case PinnedAxis.XZ:
-                //    result = new Vector3(1, 0, 1);
-                //    break;
-                //case PinnedAxis.YZ:
-                //    result = new Vector3(0, 1, 1);
-                //    break;
-                //case PinnedAxis.XYZ:
-                //    result = Vector3.one;
-                //    break;
-            }
-
-            return result;
-        }
+        get { return Vector3.right; }
     }
 
     private Vector3 MovementDelta
     {
         get
         {
-            Vector3 delta = touch.deltaPosition;
+            Vector3 delta = TouchDeltaPercentage;
 
             float positionX = PosFromDelta(delta.x);
             float positionY = PosFromDelta(delta.y);
@@ -222,7 +218,7 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     private float PosFromDelta(float delta)
     {
-        float pos = delta * sensitivity * Time.deltaTime;
+        float pos = delta * sensitivity * 100 * Time.deltaTime;
         return invertAxis ? pos : pos * -1;
     }
 

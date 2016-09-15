@@ -2648,7 +2648,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c1cbac94a9347a4c887ca4df3fe435b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sensitivity: 2.5
+  sensitivity: 3.5
   invertAxis: 0
   dampTime: 0.15
   inertiaDurationInSeconds: 1
