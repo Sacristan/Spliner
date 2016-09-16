@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 using BeetrootLab.Features;
-using System;
 
 public class SplineMapCameraMovement : MonoBehaviour
 {
-
     private struct Bounds
     {
         private float minX;
@@ -17,7 +14,6 @@ public class SplineMapCameraMovement : MonoBehaviour
             maxX = max;
         }
 
-        //Screen.width* 0.005f
         public override string ToString()
         {
             return string.Format("Min X: {0} Max X: {1}", minX, maxX);
@@ -57,7 +53,6 @@ public class SplineMapCameraMovement : MonoBehaviour
         {
             get { return MaxXBoundaryExternal - MaxXBoundaryInternal; }
         }
-
     }
 
     private Touch touch;
@@ -78,7 +73,7 @@ public class SplineMapCameraMovement : MonoBehaviour
     private bool handleBounds = false;
 
     [SerializeField]
-    private float boundaryResistanceRate = 3f;
+    private float boundaryResistanceRate = 5.5f;
 
     private readonly float scrollVelocityTreshold = 100f;
 
@@ -179,6 +174,9 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     #region Movement methods
 
+    /// <summary>
+    /// Handles regular movement
+    /// </summary>
     private void HandleMovement()
     {
         float boundaryProgress = BoundaryProgress(transform.position);
@@ -200,6 +198,9 @@ public class SplineMapCameraMovement : MonoBehaviour
         CalculateScrollVelocity();
     }
 
+    /// <summary>
+    /// calculates scroll velocity
+    /// </summary>
     private void CalculateScrollVelocity()
     {
         Vector2 correctedDeltaPos = touch.deltaPosition * _camera.orthographicSize / _camera.pixelHeight * scrollVelocityTreshold * scrollSensitivity;
@@ -208,10 +209,11 @@ public class SplineMapCameraMovement : MonoBehaviour
         scrollVelocity = correctedDeltaPos.magnitude / touch.deltaTime;
 
         if (scrollVelocity <= scrollVelocityTreshold) scrollVelocity = 0;
-
-        //Debug.Log("CalculateScrollVelocity: "+scrollVelocity);
     }
 
+    /// <summary>
+    /// Handles smooth transition between External and internal boundaries
+    /// </summary>
     private void HandleBounds()
     {
         if (!handleBounds) return;
@@ -271,6 +273,13 @@ public class SplineMapCameraMovement : MonoBehaviour
     }
     #endregion
 
+    #region Helper methods
+
+    /// <summary>
+    /// Returns what pos progress between Internal and External boundary (0 -> 1)
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
     private float BoundaryProgress(Vector3 pos)
     {
         float result = 0f;
@@ -298,12 +307,22 @@ public class SplineMapCameraMovement : MonoBehaviour
         return result;
     }
 
+    /// <summary>
+    /// Clamps walue within Min and Max external boundaries
+    /// </summary>
+    /// <param name="desiredPosition"></param>
+    /// <returns></returns>
     private Vector3 ClampWithinExternalBounds(Vector3 desiredPosition)
     {
         desiredPosition.x = Mathf.Clamp(desiredPosition.x, bounds.MinXBoundaryExternal, bounds.MaxXBoundaryExternal);
         return desiredPosition;
     }
 
+    /// <summary>
+    /// Returns ration vector depending on Screen width / height
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns></returns>
     private Vector2 GetPercentageVector(Vector2 pos)
     {
         return new Vector2(
@@ -312,6 +331,11 @@ public class SplineMapCameraMovement : MonoBehaviour
         );
     }
 
+    #endregion
+
+    /// <summary>
+    /// Calculate Spline map boundaries using Anchor positions
+    /// </summary>
     private void CalculateBounds()
     {
         Anchor[] anchors = FindObjectsOfType<Anchor>();

@@ -2653,6 +2653,7 @@ MonoBehaviour:
   inertiaDurationInSeconds: 1
   inertiaFactor: 0.05
   handleBounds: 1
+  boundaryResistanceRate: 5.5
 --- !u!20 &1751121644
 Camera:
   m_ObjectHideFlags: 0
