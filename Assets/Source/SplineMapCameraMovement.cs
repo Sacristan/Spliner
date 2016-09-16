@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using BeetrootLab.Features;
+using System;
 
 public class SplineMapCameraMovement : MonoBehaviour
 {
@@ -208,7 +209,7 @@ public class SplineMapCameraMovement : MonoBehaviour
         scrollDirection = correctedDeltaPos.normalized;
         scrollVelocity = correctedDeltaPos.magnitude / touch.deltaTime;
 
-        if (scrollVelocity <= scrollVelocityTreshold) scrollVelocity = 0;
+        if (IsOutOfBounds() || scrollVelocity <= scrollVelocityTreshold) scrollVelocity = 0;
     }
 
     /// <summary>
@@ -217,8 +218,7 @@ public class SplineMapCameraMovement : MonoBehaviour
     private void HandleBounds()
     {
         if (!handleBounds) return;
-
-        if (transform.position.x < bounds.MinXBoundaryInternal || transform.position.x > bounds.MaxXBoundaryInternal) scrollVelocity = 0f;
+        if (IsOutOfBounds()) scrollVelocity = 0f;
 
         Vector3 correctedDestination = new Vector3(
             Mathf.Clamp(transform.position.x, bounds.MinXBoundaryInternal, bounds.MaxXBoundaryInternal),
@@ -274,6 +274,15 @@ public class SplineMapCameraMovement : MonoBehaviour
     #endregion
 
     #region Helper methods
+    
+    /// <summary>
+    /// Is current position out of bounds
+    /// </summary>
+    /// <returns></returns>
+    public bool IsOutOfBounds()
+    {
+        return transform.position.x < bounds.MinXBoundaryInternal || transform.position.x > bounds.MaxXBoundaryInternal;
+    }
 
     /// <summary>
     /// Returns what pos progress between Internal and External boundary (0 -> 1)

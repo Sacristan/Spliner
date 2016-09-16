@@ -5,7 +5,7 @@ namespace BeetrootLab.Features
 
     public class AnchorVisualiser : MonoBehaviour
     {
-        private enum AnchorVisualiserStatus { Locked = 0, Available = 1 };
+        private enum AnchorVisualiserStatus { Locked = 0, Available = 1, Completed = 2 };
 
         [SerializeField]
         private AnchorVisualiserStatus anchorStatus = AnchorVisualiserStatus.Locked;
