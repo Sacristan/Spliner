@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace BeetrootLab.Features
 {
@@ -14,33 +15,60 @@ namespace BeetrootLab.Features
         private SplineMap _splineMap;
         private Camera _camera;
 
+        [SerializeField]
+        private bool isSelected;
+
+        private AnchorVisualiser[] _otherAnchorVisualisers;
+
+        public bool Selected
+        {
+            get { return isSelected; }
+            set
+            {
+                if (anchorStatus == AnchorVisualiserStatus.Locked) return;
+
+                if (value)
+                {
+                    if(_otherAnchorVisualisers == null)
+                    {
+                        //Anchor[] anchors = 
+                        AnchorVisualiser[] anchorVisualisers = FindObjectsOfType<AnchorVisualiser>();
+                        List<AnchorVisualiser> anchorVisualisersList = new List<AnchorVisualiser>(anchorVisualisers);
+                        anchorVisualisersList.RemoveAll(item => item == this);
+
+                        _otherAnchorVisualisers = anchorVisualisersList.ToArray();
+                    }
+
+                    foreach (AnchorVisualiser visualiser in _otherAnchorVisualisers)
+                        visualiser.Selected = false;
+
+                }
+                isSelected = value;
+            } 
+        }
+
         void Awake()
         {
             _meshRenderer = GetComponent<MeshRenderer>();
             _splineMap = transform.root.GetComponent<SplineMap>();
             _camera = _splineMap.transform.GetComponentInChildren<Camera>();
-            AssignMaterial();
         }
 
         void Update()
         {
             if (CanAssignMaterial())
             {
-                ChangeState();
-                AssignMaterial();
+                TryToSelectMe();
             }
+
+            AssignMaterial();
         }
 
-        private void ChangeState()
+        private void TryToSelectMe()
         {
-            switch (anchorStatus)
+            if (anchorStatus != AnchorVisualiserStatus.Locked)
             {
-                case AnchorVisualiserStatus.Locked:
-                    anchorStatus = AnchorVisualiserStatus.Available;
-                    break;
-                case AnchorVisualiserStatus.Available:
-                    anchorStatus = AnchorVisualiserStatus.Locked;
-                    break;
+                Selected = true;
             }
         }
 
@@ -79,19 +107,35 @@ namespace BeetrootLab.Features
         }
 
         /// <summary>
-        /// Assigns material depending on current AnchorVisualiserStatus
+        /// Assigns material depending on current AnchorVisualiserStatus or Selection
         /// </summary>
         private void AssignMaterial()
         {
-            switch (anchorStatus)
+            if (Selected)
             {
-                case AnchorVisualiserStatus.Locked:
-                    _meshRenderer.sharedMaterial = _splineMap.AnchorLockedMaterial;
-                    break;
-                case AnchorVisualiserStatus.Available:
-                    _meshRenderer.sharedMaterial = _splineMap.AnchorAvailableMaterial;
-                    break;
+                ApplySharedMaterial(_splineMap.AnchorSelectedMaterial);
+            }
+            else
+            {
+                switch (anchorStatus)
+                {
+                    case AnchorVisualiserStatus.Locked:
+                        ApplySharedMaterial(_splineMap.AnchorLockedMaterial);
+                        break;
+                    case AnchorVisualiserStatus.Available:
+                        ApplySharedMaterial(_splineMap.AnchorAvailableMaterial);
+                        break;
+                    case AnchorVisualiserStatus.Completed:
+                        ApplySharedMaterial(_splineMap.AnchorAvailableMaterial);
+                        break;
+                }
             }
         }
+
+        private void ApplySharedMaterial(Material mat)
+        {
+            if(_meshRenderer.sharedMaterial != mat)
+                _meshRenderer.sharedMaterial = mat;
+        }    
     }
 }

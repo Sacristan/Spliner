@@ -17,6 +17,9 @@ namespace BeetrootLab.Features
         [SerializeField]
         Material _anchorAvailableMaterial;
 
+        [SerializeField]
+        Material _anchorSelectedMaterial;
+
         public GameObject AnchorVisualisation
         {
             get { return _anchorVisualisation; }
@@ -35,6 +38,11 @@ namespace BeetrootLab.Features
         public Material AnchorAvailableMaterial
         {
             get { return _anchorAvailableMaterial; }
+        }
+
+        public Material AnchorSelectedMaterial
+        {
+            get { return _anchorSelectedMaterial; }
         }
     }
 }
