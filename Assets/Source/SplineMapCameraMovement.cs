@@ -48,6 +48,16 @@ public class SplineMapCameraMovement : MonoBehaviour
             get { return maxX + Offset; }
         }
 
+        public float MinXBoundaryDelta
+        {
+            get { return MinXBoundaryExternal - MinXBoundaryInternal; }
+        }
+
+        public float MaxXBoundaryDelta
+        {
+            get { return MaxXBoundaryExternal - MaxXBoundaryInternal; }
+        }
+
     }
 
     private Touch touch;
@@ -66,6 +76,9 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     [SerializeField]
     private bool handleBounds = false;
+
+    [SerializeField]
+    private float boundaryResistanceRate = 3f;
 
     private readonly float scrollVelocityTreshold = 100f;
 
@@ -156,7 +169,6 @@ public class SplineMapCameraMovement : MonoBehaviour
         {
             Vector2 swipeScrollMovement = GetSwipeScrollMovement();
             HandleMovementSmoothing(swipeScrollMovement);
-
             HandleBounds();
         }
 
@@ -169,11 +181,21 @@ public class SplineMapCameraMovement : MonoBehaviour
 
     private void HandleMovement()
     {
-        Vector3 calculatedPos = (Vector3)((touchPosLastFrame - touch.position) * _camera.orthographicSize / _camera.pixelHeight * 2f);
-        Vector3 calculatedPosOnAxis = new Vector3(calculatedPos.x, 0, 0);
+        float boundaryProgress = BoundaryProgress(transform.position);
 
-        Vector3 desiredPosition = transform.position + transform.TransformDirection(calculatedPosOnAxis);
-        transform.position = ClampWithinExternalBounds(desiredPosition);
+        Vector2 touchDelta = (touchPosLastFrame - touch.position);
+
+        float inputModifier = 1f;
+        if (handleBounds) inputModifier = Mathf.Clamp01( 1f - Mathf.Abs(boundaryProgress * boundaryResistanceRate) );
+
+        Vector3 calculatedScreenInput = (Vector3)(touchDelta * _camera.orthographicSize / _camera.pixelHeight * 2f) * inputModifier;
+        Vector3 calculatedScreenInputOnFixedAxis = new Vector3(calculatedScreenInput.x, 0, 0);
+
+        Vector3 desiredPosition = transform.position + (transform.TransformDirection(calculatedScreenInputOnFixedAxis));
+
+        Vector3 clampedWithinExternalBounds = ClampWithinExternalBounds(desiredPosition);
+
+        transform.position = clampedWithinExternalBounds;
 
         CalculateScrollVelocity();
     }
@@ -213,7 +235,7 @@ public class SplineMapCameraMovement : MonoBehaviour
     {
         if (deltaMovement != Vector2.zero)
         {
-            Vector3 desiredMovementDestination = ClampWithinExternalBounds( transform.position + (Vector3)deltaMovement );
+            Vector3 desiredMovementDestination = ClampWithinExternalBounds(transform.position + (Vector3)deltaMovement);
 
             if (Input.touchCount < 1)
             {
@@ -249,17 +271,44 @@ public class SplineMapCameraMovement : MonoBehaviour
     }
     #endregion
 
+    private float BoundaryProgress(Vector3 pos)
+    {
+        float result = 0f;
+        float delta = 0f;
+        float distanceFromInternalBoundary = 0f;
+
+        if (pos.x < bounds.MinXBoundaryInternal)
+        {
+            distanceFromInternalBoundary = (pos.x - bounds.MinXBoundaryInternal);
+            delta = bounds.MinXBoundaryDelta;
+        }
+        else if (pos.x > bounds.MaxXBoundaryInternal)
+        {
+            distanceFromInternalBoundary = (pos.x - bounds.MaxXBoundaryInternal);
+            delta = bounds.MaxXBoundaryDelta;
+        }
+
+        if (Mathf.Abs(distanceFromInternalBoundary) > 0f && Mathf.Abs(delta) > 0f)
+        {
+            result = distanceFromInternalBoundary / delta;
+        }
+
+        //result = (pos.x - bounds.MaxXBoundaryInternal) / bounds.MaxXBoundaryDelta;
+
+        return result;
+    }
+
     private Vector3 ClampWithinExternalBounds(Vector3 desiredPosition)
     {
         desiredPosition.x = Mathf.Clamp(desiredPosition.x, bounds.MinXBoundaryExternal, bounds.MaxXBoundaryExternal);
         return desiredPosition;
     }
 
-    private Vector2 GetPercentageVector(Vector2 vector)
+    private Vector2 GetPercentageVector(Vector2 pos)
     {
         return new Vector2(
-            vector.x / Screen.width,
-            vector.y / Screen.height
+            pos.x / Screen.width,
+            pos.y / Screen.height
         );
     }
 
